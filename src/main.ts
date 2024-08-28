@@ -9,15 +9,20 @@ export default class Isolated {
         // // append the iframe to the body
         // document.body.appendChild(iframe);
 
-        console.log(
-            generateSrcdoc(
-                {
-                    example: () => {},
-                    another: (arg1: string, arg2: number) => {},
-                },
-                "console.log('hello from user code');"
-            )
-        );
+        (async () => {
+            try {
+                let a = await generateSrcdoc(
+                    {
+                        example: () => {},
+                        another: (arg1: string, arg2: number) => {},
+                    },
+                    "console.log('hello from user code';"
+                );
+                console.log(a);
+            } catch (error) {
+                console.error(error);
+            }
+        })();
     }
 }
 

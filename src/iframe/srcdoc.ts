@@ -1,16 +1,11 @@
 import { type PredefinedFunctions } from "../types/main";
-import { parse } from "acorn";
+import { minify, Options } from "html-minifier-terser";
 
 // content for the iframe (see "Isolated" class)
-const generateSrcdoc = (predefined: PredefinedFunctions, userCode: string) => {
-    // parse the user code for syntax errors (and to limit security risks)
-    try {
-        parse(userCode, { ecmaVersion: 2020 });
-    } catch (e) {
-        console.error("isolated-js: failed to parse user code", e);
-        return "";
-    }
-
+const generateSrcdoc = async (
+    predefined: PredefinedFunctions,
+    userCode: string
+) => {
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
     const getters = Object.keys(predefined).map((key) => {
@@ -25,7 +20,16 @@ const generateSrcdoc = (predefined: PredefinedFunctions, userCode: string) => {
         return f.replace(/\n/g, "").replace(/\s+/g, " ");
     });
 
-    return `
+    const minifyOptions: Options = {
+        removeComments: true,
+        collapseWhitespace: true,
+        minifyCSS: true,
+        minifyJS: true,
+        useShortDoctype: true,
+    };
+
+    return await minify(
+        `
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -43,11 +47,15 @@ const generateSrcdoc = (predefined: PredefinedFunctions, userCode: string) => {
 
             // all predefined functions are below, if any
             ${getters.join("\n")}
-        })
+
+            ${userCode}
+        })()
     </script>
 </body>
 </html>
-`;
+`,
+        minifyOptions
+    );
 };
 
 export default generateSrcdoc;
