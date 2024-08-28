@@ -1,4 +1,4 @@
-import generateSrcdoc from "./iframe/srcdoc";
+import generateSrcdoc from "./iframe/srcdoc.js";
 
 export default class Isolated {
     constructor() {
@@ -10,10 +10,13 @@ export default class Isolated {
         document.body.appendChild(iframe);
 
         console.log(
-            generateSrcdoc({
-                example: () => {},
-                another: (arg1: string, arg2: number) => {},
-            })
+            generateSrcdoc(
+                {
+                    example: () => {},
+                    another: (arg1: string, arg2: number) => {},
+                },
+                "console.log('hello from user code');"
+            )
         );
     }
 }
