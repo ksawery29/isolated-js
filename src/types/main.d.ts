@@ -8,4 +8,5 @@ export interface IsolatedSettings {
         type: "log" | "warn" | "error",
         content: string,
     ) => void | Promise<void>; // on console.(log/warn/err)
+    predefinedFunctions?: PredefinedFunctions | undefined;
 }

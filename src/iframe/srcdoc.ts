@@ -1,20 +1,29 @@
 import { type PredefinedFunctions } from "../types/main";
 
 // content for the iframe (see "Isolated" class)
-const generateSrcdoc = (predefined: PredefinedFunctions, userCode: string) => {
+const generateSrcdoc = (
+    predefined: PredefinedFunctions | undefined,
+    userCode: string,
+) => {
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
-    const getters = Object.keys(predefined).map((key) => {
-        const toStr = predefined[key].toString();
-        const args = toStr.slice(toStr.indexOf("(") + 1, toStr.indexOf(")"));
+    let getters: string[] | undefined;
+    if (predefined !== undefined) {
+        getters = Object.keys(predefined).map((key) => {
+            const toStr = predefined[key].toString();
+            const args = toStr.slice(
+                toStr.indexOf("(") + 1,
+                toStr.indexOf(")"),
+            );
 
-        const f = `function ${key}(${args}) {
+            const f = `function ${key}(${args}) {
             return p({type: "function", name: "${key}", args: Array.from(arguments)}, "*");
         }`;
 
-        // post processing: remove newlines and extra spaces
-        return f.replace(/\n/g, "").replace(/\s+/g, " ");
-    });
+            // post processing: remove newlines and extra spaces
+            return f.replace(/\n/g, "").replace(/\s+/g, " ");
+        });
+    }
 
     return `
 <!DOCTYPE html>
@@ -33,7 +42,7 @@ const generateSrcdoc = (predefined: PredefinedFunctions, userCode: string) => {
             const p = (...args) => window.parent.postMessage(args, "*");
 
             // all predefined functions are below, if any
-            ${getters.join("\n")}
+            ${getters && getters.join("\n")}
 
             ${userCode}
         })()
