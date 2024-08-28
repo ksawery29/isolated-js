@@ -14,14 +14,18 @@ export default class Isolated {
     }
 
     public init(): void {
+        const srcDoc = generateSrcdoc(
+            this.settings.predefinedFunctions,
+            this.userCode,
+        );
+
         // create a new iframe
         const iframe = document.createElement("iframe");
         iframe.setAttribute("sandbox", "allow-scripts");
+        iframe.setAttribute("srcDoc", srcDoc);
 
         // append the iframe to the body
         document.body.appendChild(iframe);
-
-        generateSrcdoc(this.settings.predefinedFunctions, this.userCode);
     }
 }
 
