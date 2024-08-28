@@ -25,6 +25,7 @@
     },
     "homepage": "https://github.com/ksawery29/isolated-javascript#readme",
     "dependencies": {
+        "acorn": "^8.12.1",
         "typescript": "^5.5.4"
     }
 }

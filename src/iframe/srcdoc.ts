@@ -1,7 +1,16 @@
 import { type PredefinedFunctions } from "../types/main";
+import { parse } from "acorn";
 
 // content for the iframe (see "Isolated" class)
 const generateSrcdoc = (predefined: PredefinedFunctions, userCode: string) => {
+    // parse the user code for syntax errors (and to limit security risks)
+    try {
+        parse(userCode, { ecmaVersion: 2020 });
+    } catch (e) {
+        console.error("isolated-js: failed to parse user code", e);
+        return "";
+    }
+
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
     const getters = Object.keys(predefined).map((key) => {

@@ -3,11 +3,11 @@ import generateSrcdoc from "./iframe/srcdoc.js";
 export default class Isolated {
     constructor() {
         // create a new iframe
-        const iframe = document.createElement("iframe");
-        iframe.setAttribute("sandbox", "allow-scripts");
+        // const iframe = document.createElement("iframe");
+        // iframe.setAttribute("sandbox", "allow-scripts");
 
-        // append the iframe to the body
-        document.body.appendChild(iframe);
+        // // append the iframe to the body
+        // document.body.appendChild(iframe);
 
         console.log(
             generateSrcdoc(
