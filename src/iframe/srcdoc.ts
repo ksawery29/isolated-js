@@ -1,6 +1,7 @@
+// content for the iframe (see "Isolated" class)
+
 import { type PredefinedFunctions } from "../types/main";
 
-// content for the iframe (see "Isolated" class)
 const generateSrcdoc = (
     predefined: PredefinedFunctions | undefined,
     userCode: string,
@@ -33,8 +34,23 @@ const generateSrcdoc = (
         (() => {
             // override the default console.[log/error/warn] methods to send messages to the parent window
             ["log", "error", "warn"].forEach(method => {
+                let original = console[method]; // save a copy
                 console[method] = (...args) => {
-                    window.parent.postMessage({type: "console", method, args}, "*");
+                    try {
+                        // remove non-serializable objects like window or storage
+                        const serializableArgs = args.map(arg => {
+                            try {
+                                JSON.stringify(arg); // just to check if its serializable
+                                return arg;
+                            } catch (e) {
+                                return Object.prototype.toString.call(arg)
+                            }
+                        });
+                        window.parent.postMessage({type: "console", method, args: serializableArgs}, "*");
+                        original.apply(console, args);
+                    } catch (e) {
+                        original.error("isolated-js:", e)
+                    }
                 }
             });
 
