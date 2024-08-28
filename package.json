@@ -1,0 +1,30 @@
+{
+    "name": "isolated-javascript",
+    "version": "0.0.1",
+    "description": "run untrusted code securely",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "build": "npx tsc",
+        "build:run": "npx tsc && node ./dist/main.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ksawery29/isolated-javascript.git"
+    },
+    "keywords": [
+        "isolated",
+        "iframe",
+        "javascript",
+        "secure"
+    ],
+    "author": "Ksawery Szewczyk",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ksawery29/isolated-javascript/issues"
+    },
+    "homepage": "https://github.com/ksawery29/isolated-javascript#readme",
+    "dependencies": {
+        "typescript": "^5.5.4"
+    }
+}
