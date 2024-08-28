@@ -1,5 +1,5 @@
 {
-    "name": "isolated-javascript",
+    "name": "isolated-js",
     "version": "0.0.1",
     "description": "run untrusted code securely",
     "main": "index.js",
@@ -25,7 +25,6 @@
     },
     "homepage": "https://github.com/ksawery29/isolated-javascript#readme",
     "dependencies": {
-        "html-minifier-terser": "^7.2.0",
         "typescript": "^5.5.4"
     },
     "devDependencies": {
