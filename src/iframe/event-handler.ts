@@ -26,6 +26,31 @@ export default function eventHandler(
                         settings.onConsole(event.data.method, event.data.args);
                         break;
                     case "function":
+                        if (settings.predefinedFunctions == undefined) {
+                            console.error(
+                                "isolated-js: predefined functions are undefined but got requested",
+                            );
+                            return;
+                        }
+
+                        const functionName = event.data.name;
+                        if (functionName == undefined) {
+                            console.error(
+                                "isolated-js: got empty name for function",
+                            );
+                            return;
+                        }
+                        const functionArgs = event.data.args || [];
+
+                        // check if that function requested is a thing
+                        if (settings.predefinedFunctions[functionName]) {
+                            settings.predefinedFunctions[functionName](
+                                ...functionArgs,
+                            );
+                        } else {
+                            console.error("isolated-js: unknown function");
+                        }
+
                         break;
                     default:
                         console.warn(
