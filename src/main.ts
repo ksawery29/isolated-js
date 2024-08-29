@@ -1,5 +1,6 @@
+import eventHandler from "./iframe/event-handler.js";
 import generateSrcdoc from "./iframe/srcdoc.js";
-import { IsolatedSettings } from "./types/main.js";
+import { IsolatedSettings } from "./types/main";
 
 export default class Isolated {
     settings: IsolatedSettings;
@@ -16,11 +17,12 @@ export default class Isolated {
     public init(): void {
         const srcDoc = generateSrcdoc(
             this.settings.predefinedFunctions,
-            this.userCode,
+            this.userCode
         );
 
         // create a new iframe
         const iframe = document.createElement("iframe");
+        eventHandler(iframe, this.settings); // initialize the event handler
         iframe.setAttribute("sandbox", "allow-scripts");
         iframe.setAttribute("srcDoc", srcDoc);
 
@@ -28,6 +30,3 @@ export default class Isolated {
         document.body.appendChild(iframe);
     }
 }
-
-// for testing
-new Isolated("");

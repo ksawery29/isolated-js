@@ -4,7 +4,7 @@ import { IsolatedSettings } from "../types/main";
 // an event handler for all messages
 export default function eventHandler(
     iframe: HTMLIFrameElement,
-    settings: IsolatedSettings,
+    settings: IsolatedSettings
 ) {
     window.addEventListener(
         "message",
@@ -18,7 +18,7 @@ export default function eventHandler(
                     case "console":
                         if (event.data.method == undefined) {
                             console.error(
-                                "isolated-js: event.data.method is somehow undefined. this is probably a bug, please report it",
+                                "isolated-js: event.data.method is somehow undefined. this is probably a bug, please report it"
                             );
                             return;
                         }
@@ -28,7 +28,7 @@ export default function eventHandler(
                     case "function":
                         if (settings.predefinedFunctions == undefined) {
                             console.error(
-                                "isolated-js: predefined functions are undefined but got requested",
+                                "isolated-js: predefined functions are undefined but got requested"
                             );
                             return;
                         }
@@ -36,7 +36,7 @@ export default function eventHandler(
                         const functionName = event.data.name;
                         if (functionName == undefined) {
                             console.error(
-                                "isolated-js: got empty name for function",
+                                "isolated-js: got empty name for function"
                             );
                             return;
                         }
@@ -45,7 +45,7 @@ export default function eventHandler(
                         // check if that function requested is a thing
                         if (settings.predefinedFunctions[functionName]) {
                             settings.predefinedFunctions[functionName](
-                                ...functionArgs,
+                                ...functionArgs
                             );
                         } else {
                             console.error("isolated-js: unknown function");
@@ -54,15 +54,15 @@ export default function eventHandler(
                         break;
                     default:
                         console.warn(
-                            "isolated-js: unknown action got in the event handler!",
+                            "isolated-js: unknown action got in the event handler!"
                         );
                 }
             } catch (error) {
                 console.error(
                     "isolated-js: failed to parse the message from iframe",
-                    error,
+                    error
                 );
             }
-        },
+        }
     );
 }

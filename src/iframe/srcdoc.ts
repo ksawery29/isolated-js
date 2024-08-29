@@ -4,7 +4,7 @@ import { type PredefinedFunctions } from "../types/main";
 
 const generateSrcdoc = (
     predefined: PredefinedFunctions | undefined,
-    userCode: string,
+    userCode: string
 ) => {
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
@@ -14,7 +14,7 @@ const generateSrcdoc = (
             const toStr = predefined[key].toString();
             const args = toStr.slice(
                 toStr.indexOf("(") + 1,
-                toStr.indexOf(")"),
+                toStr.indexOf(")")
             );
 
             const f = `function ${key}(${args}) {

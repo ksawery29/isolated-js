@@ -8,6 +8,9 @@
 <body>
     <script type="module">
         import Isolated from "../../dist/main.js";
+        new Isolated("console.log('hi')", {
+            onConsole: (type, content) => console[type]("a message from iframe:", content)
+        }).init()
     </script>
 </body>
 </html>
