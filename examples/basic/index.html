@@ -8,8 +8,17 @@
 <body>
     <script type="module">
         import Isolated from "../../dist/main.js";
-        new Isolated("console.log('hi')", {
-            onConsole: (type, content) => console[type]("a message from iframe:", content)
+
+        new Isolated("console.log('I will attack you 😊'); alert('hi');", {
+            onConsole: (type, content) => console[type]("a message from iframe:", content),
+            predefinedFunctions: {
+                alert: (message) => {
+                    console.log("alert:", message)
+                },
+                updateStuff: () => {
+                    console.log("updateStuff")
+                }
+            }
         }).init()
     </script>
 </body>

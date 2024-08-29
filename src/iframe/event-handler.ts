@@ -23,7 +23,10 @@ export default function eventHandler(
                             return;
                         }
 
-                        settings.onConsole(event.data.method, event.data.args);
+                        settings.onConsole(
+                            event.data.method,
+                            event.data.args[0]
+                        );
                         break;
                     case "function":
                         if (settings.predefinedFunctions == undefined) {
@@ -54,7 +57,8 @@ export default function eventHandler(
                         break;
                     default:
                         console.warn(
-                            "isolated-js: unknown action got in the event handler!"
+                            "isolated-js: unknown action got in the event handler!",
+                            event.data
                         );
                 }
             } catch (error) {

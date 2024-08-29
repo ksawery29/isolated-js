@@ -18,7 +18,7 @@ const generateSrcdoc = (
             );
 
             const f = `function ${key}(${args}) {
-            return p({type: "function", name: "${key}", args: Array.from(arguments)}, "*");
+            return window.parent.postMessage({type: "function", name: "${key}", args: Array.from(arguments)}, "*");
         }`;
 
             // post processing: remove newlines and extra spaces
@@ -53,9 +53,6 @@ const generateSrcdoc = (
                     }
                 }
             });
-
-            // a basic helper function to send messages to the parent window
-            const p = (...args) => window.parent.postMessage(args, "*");
 
             // all predefined functions are below, if any
             ${getters && getters.join("\n")}
