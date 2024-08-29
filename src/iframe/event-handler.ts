@@ -23,10 +23,11 @@ export default function eventHandler(
                             return;
                         }
 
-                        settings.onConsole(
-                            event.data.method,
-                            event.data.args[0]
-                        );
+                        if (settings.onConsole)
+                            settings.onConsole(
+                                event.data.method,
+                                event.data.args[0]
+                            );
                         break;
                     case "function":
                         if (settings.predefinedFunctions == undefined) {

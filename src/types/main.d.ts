@@ -4,9 +4,10 @@ export interface PredefinedFunctions {
 }
 
 export interface IsolatedSettings {
-    onConsole: (
+    onConsole?: (
         type: "log" | "warn" | "error",
         content: string
     ) => void | Promise<void>; // on console.(log/warn/err)
     predefinedFunctions?: PredefinedFunctions | undefined;
+    hide?: boolean;
 }

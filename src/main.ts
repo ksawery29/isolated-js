@@ -10,7 +10,9 @@ export default class Isolated {
         this.settings = settings ?? {
             // default settings
             onConsole: (type, content) => console[type](content),
+            hide: true,
         };
+        this.settings.hide = this.settings.hide ?? true;
         this.userCode = userCode;
     }
 
@@ -25,6 +27,8 @@ export default class Isolated {
         eventHandler(iframe, this.settings); // initialize the event handler
         iframe.setAttribute("sandbox", "allow-scripts");
         iframe.setAttribute("srcDoc", srcDoc);
+
+        if (this.settings.hide) iframe.setAttribute("style", "display: none;"); // hide the iframe
 
         // append the iframe to the body
         document.body.appendChild(iframe);
