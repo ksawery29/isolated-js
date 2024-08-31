@@ -31,7 +31,5 @@
         "tsup": "^8.2.4",
         "typescript": "^5.5.4"
     },
-    "dependencies": {
-        "semantic-release": "^24.1.0"
-    }
+    "dependencies": {}
 }
