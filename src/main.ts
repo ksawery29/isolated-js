@@ -22,6 +22,7 @@ export default class Isolated {
 
         // create a new iframe
         const iframe = document.createElement("iframe");
+        if (this.settings.beforeInit) this.settings.beforeInit(iframe); // run the beforeInit function
 
         const id = setTimeout(() => {
             const err = () => {

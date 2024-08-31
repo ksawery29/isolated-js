@@ -11,4 +11,5 @@ export interface IsolatedSettings {
     predefinedFunctions?: PredefinedFunctions | undefined;
     hide?: boolean;
     timeout?: number;
+    beforeInit?: (element: HTMLIFrameElement) => void | Promise<void>;
 }
