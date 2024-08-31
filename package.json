@@ -1,6 +1,6 @@
 {
     "name": "isolated-js",
-    "version": "0.0.2-types",
+    "version": "0.0.3",
     "description": "run untrusted code securely",
     "type": "module",
     "main": "dist/main.js",
