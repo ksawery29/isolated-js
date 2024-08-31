@@ -10,9 +10,13 @@
         // to run this example, clone the repo and run 'yarn build' in the root directory
         import Isolated from "../../dist/main.js";
 
-        new Isolated("console.log('I will attack you 😊');", {
-            onConsole: (type, content) => console[type]("a message from iframe:", content),
-        }).init()
+        (async () => {
+            await new Isolated("console.log('I will attack you 😊'); await new Promise((resolve) => setTimeout(() => {resolve()}, 3000))", {
+                onConsole: (type, content) => console[type]("a message from iframe:", content),
+            }).start().then(() => {
+                console.log("yay, I am safe now 😊");
+            })
+        })()
     </script>
 </body>
 </html>

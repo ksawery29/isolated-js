@@ -11,10 +11,12 @@ export default class Isolated {
 
         this.settings.hide = this.settings.hide ?? true;
         this.settings.timeout = this.settings.timeout ?? 5000;
+        this.settings.removeAfterExecution =
+            this.settings.removeAfterExecution ?? true;
         this.userCode = userCode;
     }
 
-    public init(): void {
+    public async start(): Promise<HTMLIFrameElement> {
         const srcDoc = generateSrcdoc(
             this.settings.predefinedFunctions,
             this.userCode
@@ -24,29 +26,37 @@ export default class Isolated {
         const iframe = document.createElement("iframe");
         if (this.settings.beforeInit) this.settings.beforeInit(iframe); // run the beforeInit function
 
-        const id = setTimeout(() => {
-            const err = () => {
-                if (this.settings.onConsole)
-                    this.settings.onConsole("error", "execution timed out");
-                console.error("isolated-js: execution timed out");
-            };
+        let id: number;
+        if (this.settings.timeout !== -1) {
+            id = setTimeout(() => {
+                const err = () => {
+                    if (this.settings.onConsole)
+                        this.settings.onConsole("error", "execution timed out");
+                    console.error("isolated-js: execution timed out");
+                };
 
-            // remove the iframe after the timeout
-            iframe.remove();
-            err();
-        }, this.settings.timeout);
+                // remove the iframe after the timeout
+                iframe.remove();
+                err();
+            }, this.settings.timeout);
+        }
 
-        eventHandler(iframe, this.settings, () => {
-            clearTimeout(id);
-            iframe.remove();
-        }); // initialize the event handler
+        return await new Promise<HTMLIFrameElement>((resolve) => {
+            eventHandler(iframe, this.settings, () => {
+                if (this.settings.timeout != -1) clearTimeout(id);
+                if (this.settings.removeAfterExecution) iframe.remove();
 
-        iframe.setAttribute("sandbox", "allow-scripts");
-        iframe.setAttribute("srcDoc", srcDoc);
+                resolve(iframe);
+            }); // initialize the event handler
 
-        if (this.settings.hide) iframe.setAttribute("style", "display: none;"); // hide the iframe
+            iframe.setAttribute("sandbox", "allow-scripts");
+            iframe.setAttribute("srcDoc", srcDoc);
 
-        // append the iframe to the body
-        document.body.appendChild(iframe);
+            if (this.settings.hide)
+                iframe.setAttribute("style", "display: none;"); // hide the iframe
+
+            // append the iframe to the body
+            document.body.appendChild(iframe);
+        });
     }
 }
