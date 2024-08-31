@@ -7,12 +7,10 @@ export default class Isolated {
     userCode: string;
 
     constructor(userCode: string, settings?: IsolatedSettings) {
-        this.settings = settings ?? {
-            // default settings
-            onConsole: (type, content) => console[type](content),
-            hide: true,
-        };
+        this.settings = settings ?? {};
+
         this.settings.hide = this.settings.hide ?? true;
+        this.settings.timeout = this.settings.timeout ?? 5000;
         this.userCode = userCode;
     }
 
@@ -24,7 +22,24 @@ export default class Isolated {
 
         // create a new iframe
         const iframe = document.createElement("iframe");
-        eventHandler(iframe, this.settings); // initialize the event handler
+
+        const id = setTimeout(() => {
+            const err = () => {
+                if (this.settings.onConsole)
+                    this.settings.onConsole("error", "execution timed out");
+                console.error("isolated-js: execution timed out");
+            };
+
+            // remove the iframe after the timeout
+            iframe.remove();
+            err();
+        }, this.settings.timeout);
+
+        eventHandler(iframe, this.settings, () => {
+            clearTimeout(id);
+            iframe.remove();
+        }); // initialize the event handler
+
         iframe.setAttribute("sandbox", "allow-scripts");
         iframe.setAttribute("srcDoc", srcDoc);
 

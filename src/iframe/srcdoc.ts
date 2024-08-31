@@ -45,12 +45,15 @@ const generateSrcdoc = (
                 }
             };
         });
-    })();
-    `;
+    })();`;
 
-    return `<script>(() => {${customLogHandler};${
+    const csp =
+        "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'\">";
+    const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
+
+    return `${csp}<script>(async () => {${customLogHandler};${
         getters && getters.join(" ")
-    };${userCode};})()</script>`;
+    };${userCode};${end}})()</script>`;
 };
 
 export default generateSrcdoc;

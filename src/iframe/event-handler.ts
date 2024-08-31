@@ -4,7 +4,8 @@ import { IsolatedSettings } from "../types/main";
 // an event handler for all messages
 export default function eventHandler(
     iframe: HTMLIFrameElement,
-    settings: IsolatedSettings
+    settings: IsolatedSettings,
+    onFinished: () => void
 ) {
     window.addEventListener(
         "message",
@@ -55,6 +56,9 @@ export default function eventHandler(
                             console.error("isolated-js: unknown function");
                         }
 
+                        break;
+                    case "finished_execution":
+                        onFinished();
                         break;
                     default:
                         console.warn(
