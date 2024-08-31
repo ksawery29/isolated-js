@@ -11,6 +11,7 @@ const generateSrcdoc = (
     let getters: string[] | undefined;
     if (predefined !== undefined) {
         getters = Object.keys(predefined).map((key) => {
+            if (typeof predefined[key] !== "function") return "";
             const toStr = predefined[key].toString();
             const args = toStr.slice(
                 toStr.indexOf("(") + 1,

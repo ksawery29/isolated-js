@@ -2,15 +2,16 @@
     "name": "isolated-js",
     "version": "0.0.1",
     "description": "run untrusted code securely",
-    "main": "index.js",
     "type": "module",
+    "main": "dist/main.js",
+    "types": "dist/main.d.ts",
     "scripts": {
-        "build": "npx tsc",
-        "build:run": "npx tsc && node ./dist/main.js"
+        "build": "tsup",
+        "lint": "tsc"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/ksawery29/isolated-javascript.git"
+        "url": "git+https://github.com/ksawery29/isolated-js.git"
     },
     "keywords": [
         "isolated",
@@ -21,13 +22,13 @@
     "author": "Ksawery Szewczyk",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/ksawery29/isolated-javascript/issues"
+        "url": "https://github.com/ksawery29/isolated-js/issues"
     },
-    "homepage": "https://github.com/ksawery29/isolated-javascript#readme",
-    "dependencies": {
-        "typescript": "^5.5.4"
-    },
+    "homepage": "https://github.com/ksawery29/isolated-js#readme",
     "devDependencies": {
-        "@types/html-minifier-terser": "^7.0.2"
+        "@changesets/cli": "^2.27.7",
+        "@types/html-minifier-terser": "^7.0.2",
+        "tsup": "^8.2.4",
+        "typescript": "^5.5.4"
     }
 }

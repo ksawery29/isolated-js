@@ -1,5 +1,5 @@
-import { EventHandlerType } from "../types/iframe";
-import { IsolatedSettings } from "../types/main";
+import { type EventHandlerType } from "../types/iframe";
+import { type IsolatedSettings } from "../types/main";
 
 // an event handler for all messages
 export default function eventHandler(
@@ -24,7 +24,7 @@ export default function eventHandler(
                             return;
                         }
 
-                        if (settings.onConsole)
+                        if (settings.onConsole && event.data.args[0])
                             settings.onConsole(
                                 event.data.method,
                                 event.data.args[0]

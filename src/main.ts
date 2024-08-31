@@ -1,6 +1,6 @@
 import eventHandler from "./iframe/event-handler.js";
 import generateSrcdoc from "./iframe/srcdoc.js";
-import { IsolatedSettings } from "./types/main";
+import { type IsolatedSettings } from "./types/main";
 
 export default class Isolated {
     settings: IsolatedSettings;
