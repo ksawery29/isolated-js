@@ -8,7 +8,6 @@ export const tsup: Options = {
     minify: true,
     bundle: true,
     skipNodeModulesBundle: true,
-    entryPoints: ["src/index.ts"],
     watch: false,
     target: "es2015",
     outDir: "dist",

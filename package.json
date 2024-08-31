@@ -7,8 +7,7 @@
     "types": "dist/main.d.ts",
     "scripts": {
         "build": "tsup",
-        "lint": "tsc",
-        "semantic-release": "semantic-release"
+        "lint": "tsc"
     },
     "repository": {
         "type": "git",
