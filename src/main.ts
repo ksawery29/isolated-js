@@ -23,11 +23,13 @@ export default class Isolated {
         );
 
         let iframe: HTMLIFrameElement;
+        let exists: boolean = false;
 
         // the iframe might exist from previous executions
         const mightExist = document.getElementById("isolated-js-iframe");
         if (mightExist) {
             iframe = mightExist as HTMLIFrameElement;
+            exists = true;
         } else {
             // create a new iframe
             iframe = document.createElement("iframe");
@@ -54,12 +56,14 @@ export default class Isolated {
                 }, this.settings.timeout);
             }
 
-            eventHandler(iframe, this.settings, () => {
-                if (this.settings.timeout != -1) clearTimeout(id);
-                if (this.settings.removeAfterExecution) iframe.remove();
+            if (!exists) {
+                eventHandler(iframe, this.settings, () => {
+                    if (this.settings.timeout != -1) clearTimeout(id);
+                    if (this.settings.removeAfterExecution) iframe.remove();
 
-                resolve(iframe);
-            }); // initialize the event handler
+                    resolve(iframe);
+                }); // initialize the event handler
+            }
 
             iframe.setAttribute("sandbox", "allow-scripts");
             iframe.setAttribute("srcDoc", srcDoc);
