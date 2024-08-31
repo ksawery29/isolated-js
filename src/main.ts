@@ -22,26 +22,38 @@ export default class Isolated {
             this.userCode
         );
 
-        // create a new iframe
-        const iframe = document.createElement("iframe");
-        if (this.settings.beforeInit) this.settings.beforeInit(iframe); // run the beforeInit function
+        let iframe: HTMLIFrameElement;
 
-        let id: number;
-        if (this.settings.timeout !== -1) {
-            id = setTimeout(() => {
-                const err = () => {
-                    if (this.settings.onConsole)
-                        this.settings.onConsole("error", "execution timed out");
-                    console.error("isolated-js: execution timed out");
-                };
-
-                // remove the iframe after the timeout
-                iframe.remove();
-                err();
-            }, this.settings.timeout);
+        // the iframe might exist from previous executions
+        const mightExist = document.getElementById("isolated-js-iframe");
+        if (mightExist) {
+            iframe = mightExist as HTMLIFrameElement;
+        } else {
+            // create a new iframe
+            iframe = document.createElement("iframe");
+            if (this.settings.beforeInit) this.settings.beforeInit(iframe); // run the beforeInit function
         }
 
-        return await new Promise<HTMLIFrameElement>((resolve) => {
+        return await new Promise<HTMLIFrameElement>((resolve, reject) => {
+            let id: number;
+            if (this.settings.timeout !== -1) {
+                id = setTimeout(() => {
+                    const err = () => {
+                        if (this.settings.onConsole)
+                            this.settings.onConsole(
+                                "error",
+                                "execution timed out"
+                            );
+                        console.error("isolated-js: execution timed out");
+                        reject("execution timed out");
+                    };
+
+                    // remove the iframe after the timeout
+                    iframe.remove();
+                    err();
+                }, this.settings.timeout);
+            }
+
             eventHandler(iframe, this.settings, () => {
                 if (this.settings.timeout != -1) clearTimeout(id);
                 if (this.settings.removeAfterExecution) iframe.remove();
@@ -51,6 +63,10 @@ export default class Isolated {
 
             iframe.setAttribute("sandbox", "allow-scripts");
             iframe.setAttribute("srcDoc", srcDoc);
+            iframe.setAttribute("id", "isolated-js-iframe");
+            iframe.onerror = (error) => {
+                reject(error);
+            };
 
             if (this.settings.hide)
                 iframe.setAttribute("style", "display: none;"); // hide the iframe
