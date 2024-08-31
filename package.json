@@ -7,7 +7,8 @@
     "types": "dist/main.d.ts",
     "scripts": {
         "build": "tsup",
-        "lint": "tsc"
+        "lint": "tsc",
+        "semantic-release": "semantic-release"
     },
     "repository": {
         "type": "git",
@@ -26,9 +27,11 @@
     },
     "homepage": "https://github.com/ksawery29/isolated-js#readme",
     "devDependencies": {
-        "@changesets/cli": "^2.27.7",
         "@types/html-minifier-terser": "^7.0.2",
         "tsup": "^8.2.4",
         "typescript": "^5.5.4"
+    },
+    "dependencies": {
+        "semantic-release": "^24.1.0"
     }
 }
