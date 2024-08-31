@@ -1,6 +1,6 @@
 {
     "name": "isolated-js",
-    "version": "0.0.35",
+    "version": "0.0.4",
     "description": "run untrusted code securely",
     "type": "module",
     "main": "dist/main.js",
@@ -26,11 +26,14 @@
     },
     "homepage": "https://github.com/ksawery29/isolated-js#readme",
     "devDependencies": {
+        "@types/dompurify": "^3.0.5",
         "@types/html-minifier-terser": "^7.0.2",
         "tsup": "^8.2.4",
         "typescript": "^5.5.4"
     },
-    "dependencies": {},
+    "dependencies": {
+        "dompurify": "^3.1.6"
+    },
     "files": [
         "dist/"
     ]
