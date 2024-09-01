@@ -1,30 +1,18 @@
 import eventHandler from "./iframe/event-handler.js";
 import generateSrcdoc from "./iframe/srcdoc.js";
 import { type IsolatedSettings } from "./types/main";
-import DOMPurify from "dompurify";
 
 export default class Isolated {
     settings: IsolatedSettings;
     userCode: string;
     uniqueId: string;
 
-    private sanitize(userCode: string): string {
-        // really just to be safe, but idk if this is necessary mainly because the iframe is sandboxed + javascript only
-        // but it's better to be safe than sorry :)
-        return DOMPurify.sanitize(userCode, {
-            ALLOWED_TAGS: [],
-            ALLOWED_ATTR: [],
-        });
-    }
-
     constructor(userCode: string, settings?: IsolatedSettings) {
         this.settings = settings ?? {};
 
         this.settings.hide = this.settings.hide ?? true;
         this.settings.timeout = this.settings.timeout ?? 5000;
-        this.settings.removeAfterExecution =
-            this.settings.removeAfterExecution ?? true;
-        this.userCode = this.sanitize(userCode);
+        this.userCode = userCode;
         this.uniqueId = `isolated-js-iframe-${Math.random()
             .toString(36)
             .slice(2, 11)}`;
@@ -36,13 +24,17 @@ export default class Isolated {
             this.userCode
         );
 
-        let iframe: HTMLIFrameElement;
+        // get how many iframes are there
+        const iframes = document.querySelectorAll(`[data-isolated-js="true"]`);
 
-        // the iframe might exist from previous executions
-        const mightExist = document.getElementById(this.uniqueId);
-        if (mightExist) {
-            mightExist.remove();
+        if (
+            this.settings.maxIframes &&
+            iframes.length >= this.settings.maxIframes
+        ) {
+            throw new Error("isolated-js: max iframes reached");
         }
+
+        let iframe: HTMLIFrameElement;
 
         // create a new iframe
         iframe = document.createElement("iframe");
@@ -67,7 +59,7 @@ export default class Isolated {
 
             const cleanup = eventHandler(iframe, this.settings, () => {
                 if (this.settings.timeout != -1) clearTimeout(id);
-                if (this.settings.removeAfterExecution) iframe.remove();
+                iframe.remove();
 
                 resolve(iframe);
             }); // initialize the event handler
@@ -75,6 +67,7 @@ export default class Isolated {
             iframe.setAttribute("sandbox", "allow-scripts");
             iframe.setAttribute("srcDoc", srcDoc);
             iframe.setAttribute("id", this.uniqueId);
+            iframe.setAttribute("data-isolated-js", "true");
             iframe.onerror = (error) => {
                 reject(error);
             };
