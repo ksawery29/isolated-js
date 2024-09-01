@@ -90,7 +90,6 @@ export default function eventHandler(
     );
 
     return () => {
-        console.log("remove");
         window.removeEventListener("message", handler);
     };
 }
