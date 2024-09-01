@@ -10,6 +10,8 @@ const generateSrcdoc = (
     // this is probably not the best way to do it, but works for now
     let getters: string[] | undefined;
     if (predefined !== undefined) {
+        // how it works: the function is being executed in the iframe, then it sends a message to the parent window to actually execute the function
+        // after that the result is sent back to the iframe
         getters = Object.keys(predefined).map((key) => {
             if (typeof predefined[key] !== "function") return "";
             const toStr = predefined[key].toString();
@@ -18,7 +20,19 @@ const generateSrcdoc = (
                 toStr.indexOf(")")
             );
 
-            const f = `function ${key}(${args}) {return window.parent.postMessage({type: "function", name: "${key}", args: Array.from(arguments)}, "*");}`;
+            const isAsync = toStr.includes("async") ? "async" : "";
+            const sendFunctionRequest = `window.parent.postMessage({type: "function", name: "${key}", args: Array.from(arguments)}, "*");`;
+            const waitForResult = `return new Promise((resolve) => {
+                ${sendFunctionRequest}
+                window.addEventListener("message", function handler(event) {
+                    if (event.data.type === "function_result_return" && event.data.name === "${key}") {
+                        resolve(JSON.parse(event.data.args));
+                        window.removeEventListener("message", handler);
+                    }
+                });
+            });`;
+
+            const f = `${isAsync} function ${key}(${args}) {${waitForResult}}`;
             return f;
         });
     }
@@ -32,6 +46,9 @@ const generateSrcdoc = (
             console[method] = (...args) => {
                 try {
                     const serializableArgs = args.map((arg) => {
+                        if (arg instanceof Promise) {
+                            return 'Got [Promise]. You should await this to get the result.';
+                        }
                         try {
                             JSON.stringify(arg);
                             return arg;

@@ -25,7 +25,7 @@ export default function eventHandler(
                     if (settings.onConsole && event.data.args[0])
                         settings.onConsole(
                             event.data.method,
-                            event.data.args[0]
+                            (event.data.args as string[]).join(" ")
                         );
                     break;
                 case "function":
@@ -47,8 +47,18 @@ export default function eventHandler(
 
                     // check if that function requested is a thing
                     if (settings.predefinedFunctions[functionName]) {
-                        settings.predefinedFunctions[functionName](
+                        const val = settings.predefinedFunctions[functionName](
                             ...functionArgs
+                        );
+
+                        // send the result back
+                        iframe.contentWindow?.postMessage(
+                            {
+                                type: "function_result_return",
+                                name: functionName,
+                                args: JSON.stringify(val),
+                            },
+                            "*"
                         );
                     } else {
                         console.error("isolated-js: unknown function");
