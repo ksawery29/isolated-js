@@ -38,13 +38,19 @@ await isolated.run()
 
 ### Known limitations
 - If your predefined functions return a value, the user must use `await` to get the result.
+- Every predefined function is async for the isolated environment.
+
+*These liminations are due to the need to communicate between the parent page and the isolated environment.*
 
 ### Isolated environment options
 ```ts
+export interface PredefinedFunctions {
+    [key: string]: AnyFunction;
+}
 export interface IsolatedSettings {
     onConsole?: (
-        type: "log" | "warn" | "error",
-        content: string
+        type: "log" | "warn" | "error", // <- type of the log
+        content: string // <- content of the log
     ) => void | Promise<void>; // <- this will be called when the isolated environment logs something
 
     predefinedFunctions?: PredefinedFunctions | undefined; // <- predefined functions that the isolated environment can use, example:
@@ -63,3 +69,6 @@ export interface IsolatedSettings {
     maxIframes?: number; // <- max number of iframes that can be created
 }
 ```
+
+### License
+MIT

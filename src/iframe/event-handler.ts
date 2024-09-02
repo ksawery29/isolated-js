@@ -7,7 +7,7 @@ export default function eventHandler(
     settings: IsolatedSettings,
     onFinished: () => void
 ): () => void {
-    const handler = (event: MessageEvent<EventHandlerType>) => {
+    const handler = async (event: MessageEvent<EventHandlerType>) => {
         // ensure this came from the same origin
         if (event.source !== iframe.contentWindow) return;
 
@@ -23,33 +23,24 @@ export default function eventHandler(
                     }
 
                     if (settings.onConsole && event.data.args[0])
-                        settings.onConsole(
-                            event.data.method,
-                            (event.data.args as string[]).join(" ")
-                        );
+                        settings.onConsole(event.data.method, (event.data.args as string[]).join(" "));
                     break;
                 case "function":
                     if (settings.predefinedFunctions == undefined) {
-                        console.error(
-                            "isolated-js: predefined functions are undefined but got requested"
-                        );
+                        console.error("isolated-js: predefined functions are undefined but got requested");
                         return;
                     }
 
                     const functionName = event.data.name;
                     if (functionName == undefined) {
-                        console.error(
-                            "isolated-js: got empty name for function"
-                        );
+                        console.error("isolated-js: got empty name for function");
                         return;
                     }
                     const functionArgs = event.data.args || [];
 
                     // check if that function requested is a thing
                     if (settings.predefinedFunctions[functionName]) {
-                        const val = settings.predefinedFunctions[functionName](
-                            ...functionArgs
-                        );
+                        const val = await settings.predefinedFunctions[functionName](...functionArgs);
 
                         // send the result back
                         iframe.contentWindow?.postMessage(
@@ -64,30 +55,24 @@ export default function eventHandler(
                         console.error("isolated-js: unknown function");
                     }
 
+                    // send back a notification that the function has been executed
+                    iframe.contentWindow?.postMessage({ type: "function_executed", name: functionName }, "*");
+
                     break;
                 case "finished_execution":
                     onFinished();
                     break;
                 default:
-                    console.warn(
-                        "isolated-js: unknown action got in the event handler!",
-                        event.data
-                    );
+                    console.warn("isolated-js: unknown action got in the event handler!", event.data);
             }
         } catch (error) {
-            console.error(
-                "isolated-js: failed to parse the message from iframe",
-                error
-            );
+            console.error("isolated-js: failed to parse the message from iframe", error);
         }
     };
 
-    window.addEventListener(
-        "message",
-        (event: MessageEvent<EventHandlerType>) => {
-            handler(event);
-        }
-    );
+    window.addEventListener("message", async (event: MessageEvent<EventHandlerType>) => {
+        await handler(event);
+    });
 
     return () => {
         window.removeEventListener("message", handler);

@@ -13,24 +13,16 @@ export default class Isolated {
         this.settings.hide = this.settings.hide ?? true;
         this.settings.timeout = this.settings.timeout ?? 5000;
         this.userCode = userCode;
-        this.uniqueId = `isolated-js-iframe-${Math.random()
-            .toString(36)
-            .slice(2, 11)}`;
+        this.uniqueId = `isolated-js-iframe-${Math.random().toString(36).slice(2, 11)}`;
     }
 
     public async start(): Promise<HTMLIFrameElement> {
-        const srcDoc = generateSrcdoc(
-            this.settings.predefinedFunctions,
-            this.userCode
-        );
+        const srcDoc = generateSrcdoc(this.settings.predefinedFunctions, this.userCode);
 
         // get how many iframes are there
         const iframes = document.querySelectorAll(`[data-isolated-js="true"]`);
 
-        if (
-            this.settings.maxIframes &&
-            iframes.length >= this.settings.maxIframes
-        ) {
+        if (this.settings.maxIframes && iframes.length >= this.settings.maxIframes) {
             throw new Error("isolated-js: max iframes reached");
         }
 
@@ -45,8 +37,7 @@ export default class Isolated {
             if (this.settings.timeout !== -1) {
                 id = setTimeout(() => {
                     const err = () => {
-                        if (this.settings.onConsole)
-                            this.settings.onConsole("error", "canceled");
+                        if (this.settings.onConsole) this.settings.onConsole("error", "canceled");
                         console.error("isolated-js: execution timed out");
                         reject("execution timed out");
                     };
@@ -72,8 +63,7 @@ export default class Isolated {
                 reject(error);
             };
 
-            if (this.settings.hide)
-                iframe.setAttribute("style", "display: none;"); // hide the iframe
+            if (this.settings.hide) iframe.setAttribute("style", "display: none;"); // hide the iframe
 
             // append the iframe to the body
             document.body.appendChild(iframe);

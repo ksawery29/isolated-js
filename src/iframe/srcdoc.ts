@@ -2,10 +2,7 @@
 
 import { type PredefinedFunctions } from "../types/main";
 
-const generateSrcdoc = (
-    predefined: PredefinedFunctions | undefined,
-    userCode: string
-) => {
+const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: string) => {
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
     let getters: string[] | undefined;
@@ -15,24 +12,21 @@ const generateSrcdoc = (
         getters = Object.keys(predefined).map((key) => {
             if (typeof predefined[key] !== "function") return "";
             const toStr = predefined[key].toString();
-            const args = toStr.slice(
-                toStr.indexOf("(") + 1,
-                toStr.indexOf(")")
-            );
+            const args = toStr.slice(toStr.indexOf("(") + 1, toStr.indexOf(")"));
 
-            const isAsync = toStr.includes("async") ? "async" : "";
             const sendFunctionRequest = `window.parent.postMessage({type: "function", name: "${key}", args: Array.from(arguments)}, "*");`;
             const waitForResult = `return new Promise((resolve) => {
                 ${sendFunctionRequest}
                 window.addEventListener("message", function handler(event) {
                     if (event.data.type === "function_result_return" && event.data.name === "${key}") {
-                        resolve(JSON.parse(event.data.args));
                         window.removeEventListener("message", handler);
+                        if (event.data.args === undefined) resolve();
+                        else resolve(JSON.parse(event.data.args));
                     }
                 });
             });`;
 
-            const f = `${isAsync} function ${key}(${args}) {${waitForResult}}`;
+            const f = `async function ${key}(${args}) {${waitForResult}}`;
             return f;
         });
     }

@@ -21,10 +21,10 @@
                     return 1
                 },
                 waitForMe: async () => {
-                    await new Promise((resolve) => setTimeout(() => {resolve()}, 3000));
+                    await new Promise((resolve) => setTimeout(() => {resolve()}, 1000));
                     console.log("Thanks for waiting!")
                 }
-            }
+            },
         }).start()
     </script>
 </body>
