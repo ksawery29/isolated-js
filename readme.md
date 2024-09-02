@@ -12,7 +12,7 @@ A simple and isolated JavaScript environment for running untrusted code on the w
 
 ### Installation
 ```bash
-yarn add isolated-js # you can alos use npm or pnpm
+yarn add isolated-js # you can also use npm or pnpm
 ```
 
 ### Simple usage
@@ -21,7 +21,7 @@ const userCode = `
     const sum = (a, b) => a + b;
     sum(1, 2);
 
-    // this will crash the isolated environment (because of the timeout)
+    // this will crash the isolated environment (because max execution time by default is 5 seconds)
     new Promise((resolve) => {
         setTimeout(() => {
             resolve();
@@ -38,3 +38,28 @@ await isolated.run()
 
 ### Known limitations
 - If your predefined functions return a value, the user must use `await` to get the result.
+
+### Isolated environment options
+```ts
+export interface IsolatedSettings {
+    onConsole?: (
+        type: "log" | "warn" | "error",
+        content: string
+    ) => void | Promise<void>; // <- this will be called when the isolated environment logs something
+
+    predefinedFunctions?: PredefinedFunctions | undefined; // <- predefined functions that the isolated environment can use, example:
+    /* {
+    myFunction: (a: number, b: number) => {
+        return a + b;
+    };
+    }*/
+
+    hide?: boolean; // <- if true, the iframe will be hidden (default: true)
+    
+    timeout?: number; // <- max execution time in milliseconds (default: 5000)
+    
+    beforeInit?: (element: HTMLIFrameElement) => void | Promise<void>; // <- this will be called before the isolated environment is initialized
+
+    maxIframes?: number; // <- max number of iframes that can be created
+}
+```
