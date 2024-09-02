@@ -26,8 +26,6 @@
     },
     "homepage": "https://github.com/ksawery29/isolated-js#readme",
     "devDependencies": {
-        "@types/dompurify": "^3.0.5",
-        "@types/html-minifier-terser": "^7.0.2",
         "tsup": "^8.2.4",
         "typescript": "^5.5.4"
     },

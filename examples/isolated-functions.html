@@ -10,7 +10,7 @@
         // to run this example, clone the repo and run 'yarn build' in the root directory
         import Isolated from "../../dist/main.js";
 
-        new Isolated("console.log('I will attack you 😊', await updateStuff()); alert('hi');", {
+        new Isolated("console.log('I will attack you 😊', await updateStuff()); await waitForMe(); alert('hi');", {
             onConsole: (type, content) => console[type]("a message from iframe:", content),
             predefinedFunctions: {
                 alert: (message) => {
@@ -18,8 +18,11 @@
                 },
                 updateStuff: () => {
                     console.log("updateStuff")
-                    throw new Error("attacked 😈")
                     return 1
+                },
+                waitForMe: async () => {
+                    await new Promise((resolve) => setTimeout(() => {resolve()}, 3000));
+                    console.log("Thanks for waiting!")
                 }
             }
         }).start()
