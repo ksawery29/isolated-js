@@ -39,6 +39,7 @@ await isolated.run()
 ### Known limitations
 - If your predefined functions return a value, the user must use `await` to get the result.
 - Every predefined function is async for the isolated environment.
+- Predefined functions cant return a function.
 
 *These liminations are due to the need to communicate between the parent page and the isolated environment.*
 
@@ -66,7 +67,7 @@ export interface IsolatedSettings {
     
     beforeInit?: (element: HTMLIFrameElement) => void | Promise<void>; // <- this will be called before the isolated environment is initialized
 
-    maxIframes?: number; // <- max number of iframes that can be created
+    maxIframes?: number; // <- max number of iframes that can be created at once
 }
 ```
 

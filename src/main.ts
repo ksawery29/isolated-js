@@ -21,7 +21,6 @@ export default class Isolated {
 
         // get how many iframes are there
         const iframes = document.querySelectorAll(`[data-isolated-js="true"]`);
-
         if (this.settings.maxIframes && iframes.length >= this.settings.maxIframes) {
             throw new Error("isolated-js: max iframes reached");
         }
