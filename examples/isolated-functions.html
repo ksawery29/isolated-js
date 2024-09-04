@@ -9,6 +9,7 @@
     <script type="module">
         // to run this example, clone the repo and run 'yarn build' in the root directory
         import Isolated from "../../dist/main.js";
+        import { eventListener } from "../../dist/iframe/functions.js";
 
         let number = 0;
 
@@ -29,8 +30,10 @@
                 waitForMe: async () => {
                     await new Promise((resolve) => setTimeout(() => {resolve()}, 1000));
                     console.log("Thanks for waiting!")
-                }
+                },
+                example: eventListener("example")
             },
+            removeOnFinish: false
         }).start()
     </script>
 </body>

@@ -11,4 +11,5 @@ export interface IsolatedSettings {
     timeout?: number;
     beforeInit?: (element: HTMLIFrameElement) => void | Promise<void>;
     maxIframes?: number;
+    removeOnFinish?: boolean;
 }

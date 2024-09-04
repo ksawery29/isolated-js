@@ -14,6 +14,7 @@ export default class Isolated {
         this.settings.timeout = this.settings.timeout ?? 5000;
         this.userCode = userCode;
         this.uniqueId = `isolated-js-iframe-${Math.random().toString(36).slice(2, 11)}`;
+        this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
     }
 
     public async start(): Promise<HTMLIFrameElement> {
@@ -49,7 +50,7 @@ export default class Isolated {
 
             const cleanup = eventHandler(iframe, this.settings, () => {
                 if (this.settings.timeout != -1) clearTimeout(id);
-                iframe.remove();
+                if (this.settings.removeOnFinish) iframe.remove();
 
                 resolve(iframe);
             }); // initialize the event handler
