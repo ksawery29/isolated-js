@@ -33,7 +33,7 @@ const userCode = `
 import Isolated from 'isolated-js';
 
 const isolated = new Isolated(userCode, /* options */);
-await isolated.run()
+const {element, dispatch} = await isolated.run() // returns the iframe element and a function to dispatch events (see below) 
 ```
 
 ### Known limitations
@@ -45,6 +45,8 @@ await isolated.run()
 
 ### Isolated environment options
 ```ts
+export type EventListener = { eventListener: { name: string } };
+type AnyFunction = (...args: any[]) => any | EventListener;
 export interface PredefinedFunctions {
     [key: string]: AnyFunction;
 }
@@ -68,7 +70,27 @@ export interface IsolatedSettings {
     beforeInit?: (element: HTMLIFrameElement) => void | Promise<void>; // <- this will be called before the isolated environment is initialized
 
     maxIframes?: number; // <- max number of iframes that can be created at once
+
+    removeOnFinish?: boolean; // <- if true, the iframe will be removed after the execution (default: true)
 }
+```
+
+### Event listeners
+The untrusted code can listen to events from your predefined functions. To do this, you will need to create a predefined function using eventListener("name") and then call the function from the untrusted code. Args **must** be passed as either an object, an array, a string, or a number.
+
+```js
+// your code, predefined functions
+const predefined = {
+    example: eventListener("example") // <- the untrusted code can listen to this function
+}
+
+// untrusted code
+example(() => {
+    console.log("an event was triggered");
+})
+
+// you can now dispatch the event straight to the untrusted code
+dispatch("example", {...optional args...}) // <- get the dispatch function from the isolated.run() function (see above)
 ```
 
 ### License
