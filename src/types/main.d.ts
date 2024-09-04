@@ -1,4 +1,5 @@
-type AnyFunction = (...args: any[]) => any;
+export type EventListener = { eventListener: { name: string } };
+type AnyFunction = (...args: any[]) => any | EventListener;
 export interface PredefinedFunctions {
     [key: string]: AnyFunction;
 }
