@@ -14,5 +14,10 @@
         ],
         "noEmit": true,
         "moduleDetection": "force",
+        "paths": {
+            "@/*": [
+                "./dist/*"
+            ]
+        }
     },
 }

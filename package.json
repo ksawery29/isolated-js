@@ -1,14 +1,10 @@
 {
     "name": "isolated-js",
-    "version": "0.0.9",
+    "version": "0.0.9-fix",
     "description": "run untrusted code securely",
     "type": "module",
     "main": "dist/main.js",
     "types": "dist/main.d.ts",
-    "exports": {
-        ".": "./dist/index.js",
-        "./*": "./dist/*"
-    },
     "scripts": {
         "build": "tsup",
         "lint": "tsc"
