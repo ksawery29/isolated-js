@@ -1,7 +1,7 @@
 export type EventListener = { eventListener: { name: string } };
-type AnyFunction = (...args: any[]) => any | EventListener;
+type AnyFunction = (...args: any[]) => any;
 export interface PredefinedFunctions {
-    [key: string]: AnyFunction;
+    [key: string]: AnyFunction | EventListener;
 }
 
 export interface IsolatedSettings {

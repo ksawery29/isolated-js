@@ -39,7 +39,10 @@ export default function eventHandler(
                     const functionArgs = event.data.args || [];
 
                     // check if that function requested is a thing
-                    if (settings.predefinedFunctions[functionName]) {
+                    if (
+                        settings.predefinedFunctions[functionName] &&
+                        typeof settings.predefinedFunctions[functionName] === "function"
+                    ) {
                         const val = await settings.predefinedFunctions[functionName](...functionArgs);
 
                         // send the result back
