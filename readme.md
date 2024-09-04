@@ -78,6 +78,8 @@ export interface IsolatedSettings {
 ### Event listeners
 The untrusted code can listen to events from your predefined functions. To do this, you will need to create a predefined function using eventListener("name") and then call the function from the untrusted code. Args **must** be passed as either an object, an array, a string, or a number.
 
+**Note**: `removeOnFinish` must be set to false to use event listeners. Otherwise, the iframe will be removed before the event is dispatched.
+
 ```js
 // your code, predefined functions
 const predefined = {
