@@ -23,10 +23,12 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         getters = Object.keys(predefined).map((key) => {
             if (isEventListener(predefined[key])) {
                 return `function ${key}(fn) {
-                    window.addEventListener("${predefined[key].eventListener.name}", (data) => {
-                        const args = data.args;
-                        if (args === undefined) return fn();
-                        fn(...(JSON.parse(args)));
+                    window.addEventListener("message", (event) => {
+                        if (event.data.type === "event" && event.data.name === "${predefined[key].eventListener.name}") {    
+                            const args = event.data.args;
+                            if (args === undefined) return fn();
+                            try {fn(JSON.parse(args));} catch (e) {console.error(e);}
+                        }
                     });
                 }`;
             }

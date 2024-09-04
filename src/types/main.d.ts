@@ -13,3 +13,8 @@ export interface IsolatedSettings {
     maxIframes?: number;
     removeOnFinish?: boolean;
 }
+
+export interface StartReturn {
+    element: HTMLIFrameElement;
+    dispatch: (name: string, args: object) => void;
+}

@@ -1,6 +1,6 @@
 import eventHandler from "./iframe/event-handler.js";
 import generateSrcdoc from "./iframe/srcdoc.js";
-import { type IsolatedSettings } from "./types/main";
+import { StartReturn, type IsolatedSettings } from "./types/main";
 
 export default class Isolated {
     settings: IsolatedSettings;
@@ -17,7 +17,7 @@ export default class Isolated {
         this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
     }
 
-    public async start(): Promise<HTMLIFrameElement> {
+    public async start(): Promise<StartReturn> {
         const srcDoc = generateSrcdoc(this.settings.predefinedFunctions, this.userCode);
 
         // get how many iframes are there
@@ -32,7 +32,7 @@ export default class Isolated {
         iframe = document.createElement("iframe");
         if (this.settings.beforeInit) this.settings.beforeInit(iframe); // run the beforeInit function
 
-        return await new Promise<HTMLIFrameElement>((resolve, reject) => {
+        return await new Promise<StartReturn>((resolve, reject) => {
             let id: number;
             if (this.settings.timeout !== -1) {
                 id = setTimeout(() => {
@@ -43,7 +43,7 @@ export default class Isolated {
                     };
 
                     // remove the iframe after the timeout
-                    iframe.remove();
+                    if (this.settings.removeOnFinish) iframe.remove();
                     err();
                 }, this.settings.timeout);
             }
@@ -52,7 +52,36 @@ export default class Isolated {
                 if (this.settings.timeout != -1) clearTimeout(id);
                 if (this.settings.removeOnFinish) iframe.remove();
 
-                resolve(iframe);
+                resolve({
+                    element: iframe,
+                    dispatch: (name: string, args: object) => {
+                        if (!this.settings.predefinedFunctions) {
+                            console.error("isolated-js: no predefined functions defined");
+                            return;
+                        }
+
+                        // check if there are any event listeners with this name to dispatch
+                        if (this.settings.predefinedFunctions[name] == undefined) {
+                            console.error(`isolated-js: no event listener with the name ${name}`);
+                            return;
+                        }
+
+                        // check if the iframe is still there
+                        if (!iframe.contentWindow) {
+                            console.error(
+                                "isolated-js: iframe is not there. It was probably automatically removed by timeout. Set removeOnFinish to false to prevent this"
+                            );
+                            return;
+                        }
+
+                        // finally dispatch the event
+                        try {
+                            iframe.contentWindow.postMessage({ type: "event", name, args: JSON.stringify(args) }, "*");
+                        } catch (e) {
+                            console.error("isolated-js:", e);
+                        }
+                    },
+                });
             }); // initialize the event handler
 
             iframe.setAttribute("sandbox", "allow-scripts");

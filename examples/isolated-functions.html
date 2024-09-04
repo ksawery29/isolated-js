@@ -13,7 +13,7 @@
 
         let number = 0;
 
-        new Isolated("console.log('I will attack you 😊', await updateStuff()); await waitForMe(); alert('hi'); logNewNumber()", {
+        const {dispatch} = await new Isolated("example((e) => {console.log(e.hello)}); console.log('I will attack you 😊', await updateStuff()); await waitForMe(); alert('hi'); logNewNumber()", {
             onConsole: (type, content) => console[type]("a message from iframe:", content),
             predefinedFunctions: {
                 alert: (message) => {
@@ -35,6 +35,14 @@
             },
             removeOnFinish: false
         }).start()
+
+        setTimeout(() => {
+            dispatch("example", {hello: "hello"})
+        }, 500);
+
+        setTimeout(() => {
+            dispatch("example", {hello: "hello again"})
+        }, 1500);
     </script>
 </body>
 </html>
