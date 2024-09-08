@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": ".",
         "target": "es2015",
         "module": "es2015",
         "moduleResolution": "Node",
@@ -14,5 +15,10 @@
         ],
         "noEmit": true,
         "moduleDetection": "force",
+        "paths": {
+            "isolated-js/*": [
+                "./dist/*"
+            ]
+        }
     },
 }
