@@ -1,3 +1,5 @@
+import { EventHandlerType } from "./iframe";
+
 export type EventListener = { eventListener: { name: string } };
 type AnyFunction = (...args: any[]) => any;
 export interface PredefinedFunctions {
@@ -5,7 +7,7 @@ export interface PredefinedFunctions {
 }
 
 export interface IsolatedSettings {
-    onConsole?: (type: "log" | "warn" | "error", content: string) => void | Promise<void>; // on console.(log/warn/err)
+    onConsole?: (type: EventHandlerType["method"], content: string) => void | Promise<void>; // on console.(log/warn/err)
     predefinedFunctions?: PredefinedFunctions | undefined;
     hide?: boolean;
     timeout?: number;

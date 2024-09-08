@@ -57,7 +57,7 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
     // override the default console.[log/error/warn] methods to send messages to the parent window
     const customLogHandler = `
     (() => {
-        const methods = ["log", "error", "warn"];
+        const methods = ["log", "error", "warn", "debug"];
         methods.forEach((method) => {
             const original = console[method].bind(console);
             console[method] = (...args) => {

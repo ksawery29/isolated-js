@@ -52,7 +52,7 @@ export interface PredefinedFunctions {
 }
 export interface IsolatedSettings {
     onConsole?: (
-        type: "log" | "warn" | "error", // <- type of the log
+        type: "log" | "warn" | "error" | "debug", // <- type of the log
         content: string // <- content of the log
     ) => void | Promise<void>; // <- this will be called when the isolated environment logs something
 
