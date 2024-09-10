@@ -7,7 +7,7 @@ export interface PredefinedFunctions {
 }
 
 export interface IsolatedSettings {
-    onConsole?: (type: EventHandlerType["method"], content: string | Object) => void | Promise<void>; // on console.(log/warn/err)
+    onConsole?: (type: EventHandlerType["method"], ...content: any[]) => void | Promise<void>; // on console.(log/warn/err)
     predefinedFunctions?: PredefinedFunctions | undefined;
     hide?: boolean;
     timeout?: number;

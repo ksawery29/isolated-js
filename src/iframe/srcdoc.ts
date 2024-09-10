@@ -66,13 +66,14 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
                         if (arg instanceof Promise) {
                             return 'Got [Promise]. You should await this to get the result.';
                         }
-                        try {
-                            arg = JSON.stringify(arg);
-                        } catch {}
-
-                        return arg;
+                        if (typeof arg !== "string") {
+                            try {
+                                arg = JSON.stringify(arg);
+                            } catch {}
+                        }
+                        return arg.toString();
                     });
-
+    
                     window.parent.postMessage({ type: "console", method, args: serializableArgs }, "*");
                 } catch (e) {
                     original("isolated-js:", e);

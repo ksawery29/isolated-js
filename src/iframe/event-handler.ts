@@ -9,7 +9,10 @@ export default function eventHandler(
 ): () => void {
     const handler = async (event: MessageEvent<EventHandlerType>) => {
         // ensure this came from the same origin
-        if (event.source !== iframe.contentWindow) return;
+        if (event.source !== iframe.contentWindow) {
+            console.error("isolated-js: event source is not the iframe. aborting...");
+            return;
+        }
 
         // get the message and parse it
         try {
@@ -22,22 +25,32 @@ export default function eventHandler(
                         return;
                     }
 
-                    if (settings.onConsole && event.data.args[0]) {
+                    if (settings.onConsole && event.data.args) {
                         // if it can be parsed as JSON, then do it
                         try {
                             event.data.args = JSON.parse(event.data.args as string);
+                            console.log("parsing!");
                         } catch (e) {
-                            // if it can't be parsed as JSON, then just keep it as a string
+                            // if it can't be parsed as json, then just keep it as a string
                             event.data.args = event.data.args as string;
                         }
 
-                        // combine event.args if it's an array
+                        // combine all the args into an array
                         if (Array.isArray(event.data.args)) {
-                            event.data.args = event.data.args.join(" ");
+                            event.data.args = event.data.args.map((arg) => {
+                                try {
+                                    return JSON.parse(arg);
+                                } catch {
+                                    return arg;
+                                }
+                            });
+                        } else {
+                            event.data.args = [event.data.args];
                         }
 
-                        settings.onConsole(event.data.method, event.data.args);
+                        settings.onConsole(event.data.method, ...event.data.args);
                     }
+
                     break;
                 case "function":
                     if (settings.predefinedFunctions == undefined) {
