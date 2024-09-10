@@ -67,11 +67,10 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
                             return 'Got [Promise]. You should await this to get the result.';
                         }
                         try {
-                            JSON.stringify(arg);
-                            return arg;
-                        } catch {
-                            return Object.prototype.toString.call(arg);
-                        }
+                            arg = JSON.stringify(arg);
+                        } catch {}
+
+                        return arg;
                     });
 
                     window.parent.postMessage({ type: "console", method, args: serializableArgs }, "*");

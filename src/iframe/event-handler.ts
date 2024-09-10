@@ -22,8 +22,22 @@ export default function eventHandler(
                         return;
                     }
 
-                    if (settings.onConsole && event.data.args[0])
-                        settings.onConsole(event.data.method, (event.data.args as string[]).join(" "));
+                    if (settings.onConsole && event.data.args[0]) {
+                        // if it can be parsed as JSON, then do it
+                        try {
+                            event.data.args = JSON.parse(event.data.args as string);
+                        } catch (e) {
+                            // if it can't be parsed as JSON, then just keep it as a string
+                            event.data.args = event.data.args as string;
+                        }
+
+                        // combine event.args if it's an array
+                        if (Array.isArray(event.data.args)) {
+                            event.data.args = event.data.args.join(" ");
+                        }
+
+                        settings.onConsole(event.data.method, event.data.args);
+                    }
                     break;
                 case "function":
                     if (settings.predefinedFunctions == undefined) {

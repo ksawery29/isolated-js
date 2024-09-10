@@ -11,7 +11,7 @@
         import Isolated from "../../dist/main.js";
 
         document.getElementById("button").addEventListener("click", async () => {
-            await new Isolated("console.log('I will attack you 😊'); console.debug('a debug message'); await new Promise((resolve) => setTimeout(() => {resolve()}, 4000))", {
+            await new Isolated("console.log({message: 'I will attack you 😊'}, 'ok! i dont care'); console.debug('a debug message'); await new Promise((resolve) => setTimeout(() => {resolve()}, 4000))", {
                 onConsole: (type, content) => console[type]("a message from iframe:", content, type),
                 maxIframes: 2
             }).start().then(() => {
