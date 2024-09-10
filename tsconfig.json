@@ -19,6 +19,11 @@
             "isolated-js/*": [
                 "./dist/*"
             ]
-        }
+        },
     },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "docs"
+    ]
 }
