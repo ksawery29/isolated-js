@@ -51,7 +51,7 @@ export default function eventHandler(
                             event.data.args = [event.data.args];
                         }
 
-                        settings.onConsole(event.data.method, ...event.data.args);
+                        settings.onConsole(event.data.method, event.data.args);
                     }
 
                     break;

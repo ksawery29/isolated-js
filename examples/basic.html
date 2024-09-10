@@ -12,7 +12,7 @@
 
         document.getElementById("button").addEventListener("click", async () => {
             await new Isolated("console.log({message: 'I will attack you 😊'}, 'ok! i dont care'); console.debug('a debug message'); await new Promise((resolve) => setTimeout(() => {resolve()}, 4000))", {
-                onConsole: (type, content) => console[type]("a message from iframe:", content),
+                onConsole: (type, content) => console[type]("a message from iframe:", ...content),
                 maxIframes: 2
             }).start().then(() => {
                 console.log("yay, I am safe now 😊");
