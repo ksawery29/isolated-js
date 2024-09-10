@@ -1,5 +1,8 @@
 ---
 sidebar_position: 3
+title: 📚 Usage
+description: Usage
+keywords: [isolated, js, javascript, library, isolatedjs, sandbox, isolated environment]
 ---
 
 # 📚 Usage
@@ -119,6 +122,6 @@ dispatch("myCoolEvent", "some data");
 
 ### A few notes
 - `isolated.start` returns a promise that resolves with an object containing the dispatch function and the iframe element. You can use the dispatch function to send events to the isolated environment or use the iframe element to manipulate the iframe.
-- IsolatedJS is still in **WIP**. It was primarily made for [my](https://github.com/ksawery29) side project (🔜) so you might find some features missing. If you want, you can help me by contributing and make this project better! 🙌
+- IsolatedJS is still in **WIP**. It was primarily made for [my](https://github.com/ksawery29) side project (🔜) so you might find some features missing. If you want, you can help me by contributing to make this project better! 🙌
 
 Happy coding! 🚀

@@ -1,5 +1,8 @@
 ---
 sidebar_position: 2
+title: 🌐 Installation
+description: Installation
+keywords: [isolated, js, javascript, library, isolatedjs, sandbox, isolated environment]
 ---
 
 # 🌐 Installation
