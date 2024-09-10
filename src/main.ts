@@ -15,6 +15,10 @@ export default class Isolated {
         this.userCode = userCode;
         this.uniqueId = `isolated-js-iframe-${Math.random().toString(36).slice(2, 11)}`;
         this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
+
+        // this is by default false because react devtools sends a bunch of messages to the parent window when the page and the react team wont do anything about it
+        // see: https://github.com/facebook/react/issues/27529
+        this.settings.showErrorOnBadOrigin = this.settings.showErrorOnBadOrigin ?? false;
     }
 
     public async start(): Promise<StartReturn> {

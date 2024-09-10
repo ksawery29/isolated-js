@@ -14,6 +14,7 @@ export interface IsolatedSettings {
     beforeInit?: (element: HTMLIFrameElement) => void | Promise<void>;
     maxIframes?: number;
     removeOnFinish?: boolean;
+    showErrorOnBadOrigin?: boolean;
 }
 
 export interface StartReturn {

@@ -10,7 +10,11 @@ export default function eventHandler(
     const handler = async (event: MessageEvent<EventHandlerType>) => {
         // ensure this came from the same origin
         if (event.source !== iframe.contentWindow) {
-            console.error("isolated-js: event source is not the iframe. aborting...");
+            if (settings.showErrorOnBadOrigin)
+                console.error("isolated-js: event source is not the iframe. aborting...", {
+                    eventSource: event.source,
+                    iframeSource: iframe.contentWindow,
+                });
             return;
         }
 
@@ -29,7 +33,6 @@ export default function eventHandler(
                         // if it can be parsed as JSON, then do it
                         try {
                             event.data.args = JSON.parse(event.data.args as string);
-                            console.log("parsing!");
                         } catch (e) {
                             // if it can't be parsed as json, then just keep it as a string
                             event.data.args = event.data.args as string;
