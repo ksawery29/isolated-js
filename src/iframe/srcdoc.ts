@@ -23,7 +23,15 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         getters = Object.keys(predefined).map((key) => {
             if (isEventListener(predefined[key])) {
                 return `function ${key}(fn) {
+                    // try to register the event listener
+                    window.parent.postMessage({type: "register_event_listener", name: "${predefined[key].eventListener.name}"}, "*");
+                    
                     window.addEventListener("message", (event) => {
+                        if (event.data.type === "event_listener_not_registered") {
+                            console.error("isolated-js: event listener not registered", event.data.name);
+                            return;
+                        }
+                        
                         if (event.data.type === "event" && event.data.name === "${predefined[key].eventListener.name}") {    
                             const args = event.data.args;
                             if (args === undefined) return fn();

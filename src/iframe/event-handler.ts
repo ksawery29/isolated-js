@@ -7,6 +7,8 @@ export default function eventHandler(
     settings: IsolatedSettings,
     onFinished: () => void
 ): () => void {
+    let finished = false;
+
     const handler = async (event: MessageEvent<EventHandlerType>) => {
         // ensure this came from the same origin
         if (event.source !== iframe.contentWindow) {
@@ -94,6 +96,43 @@ export default function eventHandler(
                     break;
                 case "finished_execution":
                     onFinished();
+                    break;
+                case "register_event_listener":
+                    const error = (m: string) => {
+                        console.error("isolated-js:", m);
+                        iframe.contentWindow?.postMessage(
+                            { type: "event_listener_not_registered", name: event.data.name },
+                            "*"
+                        );
+                    };
+
+                    if (settings.allowEventCreationAfterInit == false && finished) {
+                        return error("event listener requested after the execution has finished");
+                    }
+
+                    if (settings.predefinedFunctions == undefined) {
+                        return error("predefined functions are undefined but got requested");
+                    }
+
+                    const listenerName = event.data.name;
+                    if (listenerName == undefined) {
+                        return error("got empty name for event listener");
+                    }
+
+                    // check if that function requested is a thing
+                    if (
+                        settings.predefinedFunctions[listenerName] &&
+                        typeof settings.predefinedFunctions[listenerName] === "object"
+                    ) {
+                        // send back a notification that the function has been executed
+                        iframe.contentWindow?.postMessage(
+                            { type: "event_listener_registered", name: listenerName },
+                            "*"
+                        );
+                    } else {
+                        return error("unknown event listener");
+                    }
+
                     break;
                 default:
                     console.warn("isolated-js: unknown action got in the event handler!", event.data);
