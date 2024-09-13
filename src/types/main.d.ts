@@ -15,6 +15,7 @@ export interface IsolatedSettings {
     maxIframes?: number;
     removeOnFinish?: boolean;
     showErrorOnBadOrigin?: boolean;
+    allowEventCreationAfterInit?: boolean;
 }
 
 export interface StartReturn {

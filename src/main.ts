@@ -10,11 +10,14 @@ export default class Isolated {
     constructor(userCode: string, settings?: IsolatedSettings) {
         this.settings = settings ?? {};
 
+        // default settings
         this.settings.hide = this.settings.hide ?? true;
         this.settings.timeout = this.settings.timeout ?? 5000;
         this.userCode = userCode;
         this.uniqueId = `isolated-js-iframe-${Math.random().toString(36).slice(2, 11)}`;
         this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
+
+        this.settings.allowEventCreationAfterInit = this.settings.allowEventCreationAfterInit ?? false;
 
         // this is by default false because react devtools sends a bunch of messages to the parent window when the page and the react team wont do anything about it
         // see: https://github.com/facebook/react/issues/27529
