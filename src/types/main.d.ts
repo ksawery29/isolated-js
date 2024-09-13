@@ -1,6 +1,6 @@
 import { EventHandlerType } from "./iframe";
 
-export type EventListener = { eventListener: { name: string } };
+export type EventListener = { eventListener: { name: string; max: number } };
 type AnyFunction = (...args: any[]) => any;
 export interface PredefinedFunctions {
     [key: string]: AnyFunction | EventListener;
@@ -16,6 +16,7 @@ export interface IsolatedSettings {
     removeOnFinish?: boolean;
     showErrorOnBadOrigin?: boolean;
     allowEventCreationAfterInit?: boolean;
+    maxGlobalEventListeners?: number; // max number of all event listeners, default is -1 (infinite)
 }
 
 export interface StartReturn {

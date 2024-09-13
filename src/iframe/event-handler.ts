@@ -9,6 +9,9 @@ export default function eventHandler(
 ): () => void {
     let finished = false;
 
+    // store how many event listeners are there (for max)
+    const eventListeners: { [key: string]: number } = {};
+
     const handler = async (event: MessageEvent<EventHandlerType>) => {
         // ensure this came from the same origin
         if (event.source !== iframe.contentWindow) {
@@ -99,7 +102,6 @@ export default function eventHandler(
                     finished = true;
                     break;
                 case "register_event_listener":
-                    console.log("trying to register event listener", event.data);
                     const error = (m: string) => {
                         console.error("isolated-js:", m);
                         iframe.contentWindow?.postMessage(
@@ -107,6 +109,14 @@ export default function eventHandler(
                             "*"
                         );
                     };
+
+                    // check if the event listener count is more than the global max (defined in settings)
+                    if (
+                        settings.maxGlobalEventListeners !== -1 &&
+                        eventListeners.length >= (settings.maxGlobalEventListeners ?? -1)
+                    ) {
+                        return error("max global event listeners reached");
+                    }
 
                     if (settings.allowEventCreationAfterInit == false && finished) {
                         return error("event listener requested after the execution has finished");
@@ -119,6 +129,17 @@ export default function eventHandler(
                     const listenerName = event.data.name;
                     if (listenerName == undefined) {
                         return error("got empty name for event listener");
+                    }
+
+                    // check if the event listener count is more than the max
+                    const listenerMax = settings.predefinedFunctions[listenerName];
+                    if (listenerMax && typeof listenerMax === "object" && listenerMax.eventListener.max !== -1) {
+                        if (
+                            eventListeners[listenerName] &&
+                            eventListeners[listenerName] >= listenerMax.eventListener.max
+                        ) {
+                            return error("max event listeners reached");
+                        }
                     }
 
                     // check if that function requested is a thing
@@ -134,6 +155,10 @@ export default function eventHandler(
                     } else {
                         return error("unknown event listener");
                     }
+
+                    // store how many event listeners are there
+                    if (eventListeners[listenerName] == undefined) eventListeners[listenerName] = 0;
+                    eventListeners[listenerName]++;
 
                     break;
                 default:

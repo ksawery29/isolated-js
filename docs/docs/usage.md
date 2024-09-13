@@ -82,6 +82,41 @@ Default: `true`
 
 ---------
 
+- **allowEventCreationAfterInit**: A boolean that specifies whether the event listeners can be created after the code finishes executing. Example:
+```javascript
+allowEventCreationAfterInit: true
+```
+
+Default: `false`
+
+Setting it to true is generally not recommended unless you have a specific reason, since this can lead to security and performance issues.
+Here's an example of how a bad actor could use event listeners to potentially slow down the code:
+```javascript
+myEvent(() => {
+    for (let i = 0; i < 1000000000; i++) {
+        myEvent(() => {
+            console.log("hi")
+        })
+    }
+})
+```
+
+The code above will create a billion event listeners, which will slow down the code significantly if you dispatched the event in your code
+Alternatively, you can set a limit for the number of event listeners that can be created for a specific event. See the [Sending Events](#sending-events) section for more information.
+
+---------
+
+- **maxGlobalEventListeners**: The maximum number of global event listeners that can be created. If the limit is reached, it will throw an error. Example:
+```javascript
+maxGlobalEventListeners: 5
+```
+
+This can be helpful if you want to have consistency across all your events and dont want to set a limit for each event individually.
+
+Default: -1 which means that there is no limit.
+
+---------
+
 - **showErrorOnBadOrigin**: A boolean that specifies whether an internal error should be thrown if the origin of the message is not the same.
 ```javascript
 showErrorOnBadOrigin: true
@@ -119,6 +154,16 @@ dispatch("myCoolEvent");
 // optionally, you can also send data
 dispatch("myCoolEvent", "some data");
 ```
+
+You can also limit how many event listeners can be registered for a specific event. This can be done by passing the maximum number of listeners as the second argument to the `eventListener` function. Example:
+```javascript
+predefinedFunctions: {
+    myCoolEvent: eventListener("myCoolEvent", 5)
+}
+```
+
+Default: -1 which means that there is no limit.
+Its recommended to set a limit for the number of event listeners that can be created for a specific event to prevent bad actors from slowing down the code. (for more information see the `allowEventCreationAfterInit` option in the [Configuration Options](#configuration-options) section)
 
 ### A few notes
 - `isolated.start` returns a promise that resolves with an object containing the dispatch function and the iframe element. You can use the dispatch function to send events to the isolated environment or use the iframe element to manipulate the iframe.

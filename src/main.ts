@@ -18,6 +18,7 @@ export default class Isolated {
         this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
 
         this.settings.allowEventCreationAfterInit = this.settings.allowEventCreationAfterInit ?? false;
+        this.settings.maxGlobalEventListeners = this.settings.maxGlobalEventListeners ?? -1;
 
         // this is by default false because react devtools sends a bunch of messages to the parent window when the page and the react team wont do anything about it
         // see: https://github.com/facebook/react/issues/27529

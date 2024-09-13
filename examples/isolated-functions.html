@@ -13,7 +13,7 @@
 
         let number = 0;
 
-        const {dispatch} = await new Isolated("example((e) => {example((v) => {console.log(v)})}); console.log('I will attack you 😊', await updateStuff()); await waitForMe(); alert('hi'); logNewNumber()", {
+        const {dispatch} = await new Isolated("example((e) => {example((v) => {console.log(v)})}); example((e) => {}); console.log('I will attack you 😊', await updateStuff()); await waitForMe(); alert('hi'); logNewNumber()", {
             onConsole: (type, content) => console[type](...content),
             predefinedFunctions: {
                 alert: (message) => {
@@ -31,7 +31,7 @@
                     await new Promise((resolve) => setTimeout(() => {resolve()}, 1000));
                     console.log("Thanks for waiting!")
                 },
-                example: eventListener("example")
+                example: eventListener("example", 1)
             },
             removeOnFinish: false,
         }).start()
