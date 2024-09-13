@@ -96,8 +96,10 @@ export default function eventHandler(
                     break;
                 case "finished_execution":
                     onFinished();
+                    finished = true;
                     break;
                 case "register_event_listener":
+                    console.log("trying to register event listener", event.data);
                     const error = (m: string) => {
                         console.error("isolated-js:", m);
                         iframe.contentWindow?.postMessage(

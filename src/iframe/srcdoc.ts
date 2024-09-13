@@ -26,9 +26,10 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
                     // try to register the event listener
                     window.parent.postMessage({type: "register_event_listener", name: "${predefined[key].eventListener.name}"}, "*");
                     
-                    window.addEventListener("message", (event) => {
+                    const h = (event) => {
                         if (event.data.type === "event_listener_not_registered") {
-                            console.error("isolated-js: event listener not registered", event.data.name);
+                            console.error("isolated-js: failed to register event listener with name:", event.data.name);
+                            window.removeEventListener("message", h);
                             return;
                         }
                         
@@ -37,6 +38,9 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
                             if (args === undefined) return fn();
                             try {fn(JSON.parse(args));} catch (e) {console.error(e);}
                         }
+                    } 
+                    window.addEventListener("message", (event) => {
+                        h(event)
                     });
                 }`;
             }
