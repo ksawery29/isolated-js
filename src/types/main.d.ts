@@ -8,6 +8,7 @@ export interface PredefinedFunctions {
 
 export interface IsolatedSettings {
     onConsole?: (type: EventHandlerType["method"], ...content: any[]) => void | Promise<void>; // on console.(log/warn/err)
+    onError?: (error: any | Error) => void | Promise<void>; // on uncaught error by e.g throw new Error() in the isolated code
     predefinedFunctions?: PredefinedFunctions | undefined;
     hide?: boolean;
     timeout?: number;

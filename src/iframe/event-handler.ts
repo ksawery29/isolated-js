@@ -161,6 +161,13 @@ export default function eventHandler(
                     eventListeners[listenerName]++;
 
                     break;
+                case "error":
+                    if (settings.onError) {
+                        settings.onError(event.data.args);
+                    } else {
+                        console.error("isolated-js: got an error but no error handler is defined");
+                    }
+                    break;
                 default:
                     console.warn("isolated-js: unknown action got in the event handler!", event.data);
             }

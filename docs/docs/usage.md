@@ -165,6 +165,22 @@ predefinedFunctions: {
 Default: -1 which means that there is no limit.
 Its recommended to set a limit for the number of event listeners that can be created for a specific event to prevent bad actors from slowing down the code. (for more information see the `allowEventCreationAfterInit` option in the [Configuration Options](#configuration-options) section)
 
+---------
+
+### Catching Errors in the Isolated Environment
+You can catch errors that occur in the isolated environment by using the `onError` function. The `onError` function will be called when an error occurs in the isolated environment. It takes an error as an argument. Example:
+```javascript
+const isolated = new Isolated(`
+  throw new Error('Something went wrong!');
+`, {
+    onError: (error) => {
+        console.error(error.message);
+    }
+}).start();
+```
+
+Type `error` is `any | Error`.
+
 ### A few notes
 - `isolated.start` returns a promise that resolves with an object containing the dispatch function and the iframe element. You can use the dispatch function to send events to the isolated environment or use the iframe element to manipulate the iframe.
 - IsolatedJS is still in **WIP**. It was primarily made for [my](https://github.com/ksawery29) side project (🔜) so you might find some features missing. If you want, you can help me by contributing to make this project better! 🙌
