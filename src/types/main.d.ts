@@ -18,6 +18,7 @@ export interface IsolatedSettings {
     showErrorOnBadOrigin?: boolean;
     allowEventCreationAfterInit?: boolean;
     maxGlobalEventListeners?: number; // max number of all event listeners, default is -1 (infinite)
+    dangerousBeforeCode?: string;
 }
 
 export interface StartReturn {

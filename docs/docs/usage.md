@@ -181,6 +181,25 @@ const isolated = new Isolated(`
 
 Type `error` is `any | Error`.
 
+---------
+
+# Adding custom code before the user code
+You can add custom code before the user code (e.g for custom errors) by using the `dangerousBeforeCode` option. The `dangerous` prefix is there to indicate that this option should not be exposed to the user, as it will paste the code directly before anyting else (even before isolated-js core). Example:
+```javascript
+const isolated = new Isolated(`
+  console.log('Hello, World!');
+`, {
+    dangerousBeforeCode: `
+        class CustomError extends Error {
+            constructor(message) {
+                super(message);
+                this.name = 'CustomError';
+            }
+        }
+    `
+}).start();
+```
+
 ### A few notes
 - `isolated.start` returns a promise that resolves with an object containing the dispatch function and the iframe element. You can use the dispatch function to send events to the isolated environment or use the iframe element to manipulate the iframe.
 - IsolatedJS is still in **WIP**. It was primarily made for [my](https://github.com/ksawery29) side project (🔜) so you might find some features missing. If you want, you can help me by contributing to make this project better! 🙌

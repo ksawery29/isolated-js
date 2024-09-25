@@ -26,7 +26,7 @@ export default class Isolated {
     }
 
     public async start(): Promise<StartReturn> {
-        const srcDoc = generateSrcdoc(this.settings.predefinedFunctions, this.userCode);
+        const srcDoc = generateSrcdoc(this.settings.predefinedFunctions, this.userCode, this.settings.dangerousBeforeCode);
 
         // get how many iframes are there
         const iframes = document.querySelectorAll(`[data-isolated-js="true"]`);

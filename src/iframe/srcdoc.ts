@@ -2,7 +2,7 @@
 
 import { type PredefinedFunctions, type EventListener } from "../types/main";
 
-const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: string) => {
+const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: string, before?: string) => {
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
     let getters: string[] | undefined;
@@ -94,12 +94,11 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         });
     })();`;
 
-    const csp =
-        "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'\">";
+    const csp = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'\">";
     const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
     const sendError = `window.parent.postMessage({type: "error", args: e}, "*");`;
 
-    return `${csp}<script>(async () => { try { ${customLogHandler}; ${
+    return `${csp}<script>${before && before} (async () => { try { ${customLogHandler}; ${
         getters && getters.join(" ")
     }; ${userCode}; ${end} } catch (e) { console.error(e.message); ${sendError}; ${end} } })()</script>`;
 };
