@@ -97,7 +97,7 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
     const csp =
         "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'\">";
     const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
-    const sendError = `window.parent.postMessage({type: "error", args: e.toString()}, "*");`;
+    const sendError = `window.parent.postMessage({type: "error", args: e}, "*");`;
 
     return `${csp}<script>(async () => { try { ${customLogHandler}; ${
         getters && getters.join(" ")

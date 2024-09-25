@@ -11,9 +11,10 @@
         import Isolated from "../../dist/main.js";
 
         document.getElementById("button").addEventListener("click", async () => {
-            await new Isolated("console.log({message: 'I will attack you 😊'}, 'ok! i dont care'); console.debug('a debug message'); await new Promise((resolve) => setTimeout(() => {resolve()}, 3000)); throw new Error('hi')", {
+            await new Isolated("console.log({message: 'I will attack you 😊'}, 'ok! i dont care'); console.debug('a debug message'); throw new Error('hi'); await new Promise((resolve) => setTimeout(() => {resolve()}, 3000));", {
                 onConsole: (type, content) => console[type]("a message from iframe:", ...content),
-                maxIframes: 2
+                maxIframes: 2,
+                onError: (error) => console.error("an error occured:", error.stack),
             }).start().then(() => {
                 console.log("yay, I am safe now 😊");
             });
