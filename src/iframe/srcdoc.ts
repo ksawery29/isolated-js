@@ -100,7 +100,7 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
 
     return `${csp}<script>${before ?? ""}; (async () => { try { ${customLogHandler}; ${
         getters && getters.join(" ")
-    }; ${userCode}; ${end} } catch (e) { console.error(e.message); ${sendError}; ${end} } })()</script>`;
+    }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end} } })()</script>`;
 };
 
 export default generateSrcdoc;
