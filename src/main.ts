@@ -45,7 +45,7 @@ export default class Isolated {
             if (this.settings.timeout !== -1) {
                 id = setTimeout(() => {
                     const err = () => {
-                        if (this.settings.onConsole) this.settings.onConsole("error", "canceled");
+                        if (this.settings.onConsole) this.settings.onConsole("error", { message: "canceled", reason: "timeout" });
                         console.error("isolated-js: execution timed out");
                         reject("execution timed out");
                     };
