@@ -98,7 +98,7 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
     const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
     const sendError = `window.parent.postMessage({type: "error", args: e}, "*");`;
 
-    return `${csp}<script>${before && before} (async () => { try { ${customLogHandler}; ${
+    return `${csp}<script>${before ?? ""}; (async () => { try { ${customLogHandler}; ${
         getters && getters.join(" ")
     }; ${userCode}; ${end} } catch (e) { console.error(e.message); ${sendError}; ${end} } })()</script>`;
 };
