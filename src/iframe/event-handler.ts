@@ -2,11 +2,7 @@ import { type EventHandlerType } from "../types/iframe";
 import { type IsolatedSettings } from "../types/main";
 
 // an event handler for all messages
-export default function eventHandler(
-    iframe: HTMLIFrameElement,
-    settings: IsolatedSettings,
-    onFinished: () => void
-): () => void {
+export default function eventHandler(iframe: HTMLIFrameElement, settings: IsolatedSettings, onFinished: () => void): () => void {
     let finished = false;
 
     // store how many event listeners are there (for max)
@@ -104,10 +100,7 @@ export default function eventHandler(
                 case "register_event_listener":
                     const error = (m: string) => {
                         console.error("isolated-js:", m);
-                        iframe.contentWindow?.postMessage(
-                            { type: "event_listener_not_registered", name: event.data.name },
-                            "*"
-                        );
+                        iframe.contentWindow?.postMessage({ type: "event_listener_not_registered", name: event.data.name }, "*");
                     };
 
                     // check if the event listener count is more than the global max (defined in settings)
@@ -134,10 +127,7 @@ export default function eventHandler(
                     // check if the event listener count is more than the max
                     const listenerMax = settings.predefinedFunctions[listenerName];
                     if (listenerMax && typeof listenerMax === "object" && listenerMax.eventListener.max !== -1) {
-                        if (
-                            eventListeners[listenerName] &&
-                            eventListeners[listenerName] >= listenerMax.eventListener.max
-                        ) {
+                        if (eventListeners[listenerName] && eventListeners[listenerName] >= listenerMax.eventListener.max) {
                             return error("max event listeners reached");
                         }
                     }
@@ -148,10 +138,7 @@ export default function eventHandler(
                         typeof settings.predefinedFunctions[listenerName] === "object"
                     ) {
                         // send back a notification that the function has been executed
-                        iframe.contentWindow?.postMessage(
-                            { type: "event_listener_registered", name: listenerName },
-                            "*"
-                        );
+                        iframe.contentWindow?.postMessage({ type: "event_listener_registered", name: listenerName }, "*");
                     } else {
                         return error("unknown event listener");
                     }
@@ -162,6 +149,11 @@ export default function eventHandler(
 
                     break;
                 case "error":
+                    // isolated environment always converts the error object to a string because even though post messaging can handle objects
+                    // the error itself is turned into a generic one (so just Error) and its a pain for custom error classes
+                    // so the error is stringified and then parsed back to an object to skip the weirdness
+                    event.data.args = JSON.parse(event.data.args as string);
+
                     if (settings.onError) {
                         settings.onError(event.data.args);
                     } else {

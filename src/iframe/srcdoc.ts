@@ -96,11 +96,11 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
 
     const csp = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'\">";
     const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
-    const sendError = `window.parent.postMessage({type: "error", args: e}, "*");`;
+    const sendError = `window.parent.postMessage({type: "error", args: JSON.stringify(e)}, "*");`;
 
     return `${csp}<script>${before ?? ""}; (async () => { try { ${customLogHandler}; ${
         getters && getters.join(" ")
-    }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end} } })()</script>`;
+    }; ${userCode}; ${end} } catch (e) { console.log(e); ${sendError}; ${end} } })()</script>`;
 };
 
 export default generateSrcdoc;
