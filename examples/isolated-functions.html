@@ -31,8 +31,11 @@
                     await new Promise((resolve) => setTimeout(() => {resolve()}, 1000));
                     console.log("Thanks for waiting!")
                 },
-                example: eventListener("example", 1)
+                example: eventListener("example", 1, () => {
+                    return false;
+                })
             },
+            onError: (error) => console.error("an error occured:", error.stack),
             removeOnFinish: false,
         }).start()
 

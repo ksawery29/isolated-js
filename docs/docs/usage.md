@@ -165,6 +165,18 @@ predefinedFunctions: {
 Default: -1 which means that there is no limit.
 Its recommended to set a limit for the number of event listeners that can be created for a specific event to prevent bad actors from slowing down the code. (for more information see the `allowEventCreationAfterInit` option in the [Configuration Options](#configuration-options) section)
 
+If you want to crate an event listener only if a specific condition is met, you can pass a predicate function as the third argument to the `eventListener` function. Example:
+```javascript
+predefinedFunctions: {
+    myCoolEvent: eventListener("myCoolEvent", 5, () => {
+        return true;
+    })
+}
+```
+
+If the predicate function returns false, the event listener will not be created.
+This is optional, and defaults to true.
+
 ---------
 
 ### Catching Errors in the Isolated Environment

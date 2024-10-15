@@ -64,6 +64,8 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
             const f = `async function ${key}(${args}) {${waitForResult}}`;
             return f;
         });
+    } else {
+        console.debug("isolated-js: no predefined functions found, skipping");
     }
 
     // override the default console.[log/error/warn] methods to send messages to the parent window
