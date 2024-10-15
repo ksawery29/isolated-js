@@ -1,7 +1,7 @@
 import { EventHandlerType } from "./iframe";
 
 export type EventListener = { eventListener: { name: string; max: number } };
-type AnyFunction = (...args: any[]) => any;
+type AnyFunction = ((...args: any[]) => any) | null;
 export interface PredefinedFunctions {
     [key: string]: AnyFunction | EventListener;
 }
