@@ -123,7 +123,7 @@ showErrorOnBadOrigin: true
 ```
 Default: `false`
 
-⚠️ **Warning**: if you use react-devtools, after enabling this option, you will see a lot of errors in the console in a fixed interval. This is because react-devtools sends a bunch of random messages to the iframe.
+⚠️ **Warning**: if you use react-devtools, after enabling this option, you will see a lot of errors in the console in a fixed interval. This is because react-devtools sends a bunch of random messages to the DOM, which isolated-js catches.
 You can try it by yourself by adding an event listener for all messages:
 ```javascript
 window.addEventListener("message", (e) => {
@@ -146,7 +146,7 @@ const isolated = new Isolated(`
 });
 
 // wait until the isolated code executed fully
-const {dispatch} = await isolated.start()
+const { dispatch } = await isolated.start()
 
 // finally, send the event
 dispatch("myCoolEvent");
