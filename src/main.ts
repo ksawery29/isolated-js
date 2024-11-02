@@ -28,11 +28,19 @@ export default class Isolated {
     public async start(): Promise<StartReturn> {
         const srcDoc = generateSrcdoc(this.settings.predefinedFunctions, this.userCode, this.settings.dangerousBeforeCode);
 
-        // get how many iframes are there
+        // get how many iframes (inside shadow roots) are there
         const iframes = document.querySelectorAll(`[data-isolated-js="true"]`);
         if (this.settings.maxIframes && iframes.length >= this.settings.maxIframes) {
             throw new Error("isolated-js: max iframes reached");
         }
+
+        // create a new shadow root to isolate it even more
+        const shadowRoot = document.createElement("div");
+        const root = shadowRoot.attachShadow({ mode: "closed" });
+        shadowRoot.setAttribute("data-isolated-js", "true");
+
+        // add the shadow root itself to the body
+        document.body.appendChild(shadowRoot);
 
         let iframe: HTMLIFrameElement;
 
@@ -51,14 +59,14 @@ export default class Isolated {
                     };
 
                     // remove the iframe after the timeout
-                    if (this.settings.removeOnFinish) iframe.remove();
+                    if (this.settings.removeOnFinish) shadowRoot.remove();
                     err();
                 }, this.settings.timeout);
             }
 
             const cleanup = eventHandler(iframe, this.settings, () => {
                 if (this.settings.timeout != -1) clearTimeout(id);
-                if (this.settings.removeOnFinish) iframe.remove();
+                if (this.settings.removeOnFinish) shadowRoot.remove();
 
                 resolve({
                     element: iframe,
@@ -102,8 +110,8 @@ export default class Isolated {
 
             if (this.settings.hide) iframe.setAttribute("style", "display: none;"); // hide the iframe
 
-            // append the iframe to the body
-            document.body.appendChild(iframe);
+            // append the iframe to the shadow root
+            root.appendChild(iframe);
 
             return cleanup();
         });
