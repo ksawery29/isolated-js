@@ -2,7 +2,7 @@
 
 import { type PredefinedFunctions, type EventListener } from "../types/main";
 
-const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: string, before?: string) => {
+const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: string, maxHeapSize: number, before?: string) => {
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
     let getters: string[] | undefined;
@@ -96,7 +96,25 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         });
     })();`;
 
-    const csp = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'\">";
+    const heapSizeLimiter = `
+        // check the memory usage of the iframe every 100ms
+        setInterval(() => {
+            const usage = window.performance.memory.usedJSHeapSize;
+            if (usage > ${maxHeapSize}) {
+                console.error("isolated-js: memory usage exceeded, killing the iframe");
+                throw new Error("security: memory usage exceeded");
+            }
+        }, 100);
+    `;
+
+    const csp = `<meta http-equiv="Content-Security-Policy" content="
+      default-src 'none';
+      script-src 'unsafe-inline';
+      base-uri 'none';
+      form-action 'none';
+      sandbox allow-scripts;
+    ">`;
+
     const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
     const sendError = `window.parent.postMessage({type: "error", args: JSON.stringify({
         name: e.name,
