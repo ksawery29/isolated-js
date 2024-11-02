@@ -108,11 +108,15 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
     `;
 
     const csp = `<meta http-equiv="Content-Security-Policy" content="
-      default-src 'none';
-      script-src 'unsafe-inline';
-      base-uri 'none';
-      form-action 'none';
-      sandbox allow-scripts;
+        default-src 'none';
+        script-src 'unsafe-inline';
+        connect-src 'none';
+        style-src 'none';
+        img-src 'none';
+        font-src 'none';
+        object-src 'none';
+        media-src 'none';
+        frame-src 'none';
     ">`;
 
     const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
@@ -123,9 +127,20 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         e
     })}, "*");`;
 
-    return `${csp}<script>(async () => { ${before ?? ""}; try { ${heapSizeLimiter}; ${customLogHandler}; ${
+    const navigationBlocker = `
+        window.location = new Proxy(window.location, {
+            set: () => undefined,
+            get: () => undefined,
+        });
+        window.history = new Proxy(window.history, {
+            set: () => undefined,
+            get: () => undefined,
+        });
+    `;
+
+    return `${csp}<script>(async () => { ${before ?? ""}; try { ${heapSizeLimiter}; ${navigationBlocker}; ${customLogHandler}; ${
         getters && getters.join(" ")
-    }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end} } })()</script>`;
+    }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end}; } })() /*isolated-js*/</script>`;
 };
 
 export default generateSrcdoc;

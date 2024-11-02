@@ -108,6 +108,11 @@ export default class Isolated {
             }); // initialize the event handler
 
             iframe.setAttribute("sandbox", "allow-scripts");
+
+            iframe.setAttribute("loading", "lazy");
+            iframe.setAttribute("referrerpolicy", "no-referrer");
+            iframe.setAttribute("importance", "low");
+
             iframe.setAttribute("srcDoc", srcDoc);
             iframe.setAttribute("id", this.uniqueId);
             iframe.setAttribute("data-isolated-js", "true");
