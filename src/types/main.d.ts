@@ -19,6 +19,7 @@ export interface IsolatedSettings {
     allowEventCreationAfterInit?: boolean;
     maxGlobalEventListeners?: number; // max number of all event listeners, default is -1 (infinite)
     dangerousBeforeCode?: string;
+    maxHeapSize?: number; // max heap size in bytes, default is 10000000 (10mb)
 }
 
 export interface StartReturn {

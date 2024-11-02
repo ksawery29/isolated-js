@@ -17,6 +17,8 @@ export default class Isolated {
         this.uniqueId = `isolated-js-iframe-${Math.random().toString(36).slice(2, 11)}`;
         this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
 
+        this.settings.maxHeapSize = this.settings.maxHeapSize ?? 10000000; // 10mb
+
         this.settings.allowEventCreationAfterInit = this.settings.allowEventCreationAfterInit ?? false;
         this.settings.maxGlobalEventListeners = this.settings.maxGlobalEventListeners ?? -1;
 
@@ -26,7 +28,12 @@ export default class Isolated {
     }
 
     public async start(): Promise<StartReturn> {
-        const srcDoc = generateSrcdoc(this.settings.predefinedFunctions, this.userCode, this.settings.dangerousBeforeCode);
+        const srcDoc = generateSrcdoc(
+            this.settings.predefinedFunctions,
+            this.userCode,
+            this.settings.maxHeapSize ?? 10000000, // 10mb
+            this.settings.dangerousBeforeCode
+        );
 
         // get how many iframes (inside shadow roots) are there
         const iframes = document.querySelectorAll(`[data-isolated-js="true"]`);

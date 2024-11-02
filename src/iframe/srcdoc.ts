@@ -123,7 +123,7 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         e
     })}, "*");`;
 
-    return `${csp}<script>(async () => { ${before ?? ""}; try { ${customLogHandler}; ${
+    return `${csp}<script>(async () => { ${before ?? ""}; try { ${heapSizeLimiter}; ${customLogHandler}; ${
         getters && getters.join(" ")
     }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end} } })()</script>`;
 };

@@ -16,7 +16,7 @@
                 maxIframes: 2,
                 onError: (error) => console.error("an error occured:", error.stack),
                 // dangerousBeforeCode: "return;" <- use with caution
-                removeOnFinish: true
+                removeOnFinish: false
             }).start().then(() => {
                 console.log("yay, I am safe now 😊");
             });
