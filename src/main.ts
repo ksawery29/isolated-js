@@ -29,10 +29,14 @@ export default class Isolated {
     }
 
     public async start(): Promise<StartReturn> {
+        // a secret code that allows the iframe to send messages to the parent window
+        const secret = Math.random().toString(36).slice(2, 11);
+
         const srcDoc = generateSrcdoc(
             this.settings.predefinedFunctions,
             this.userCode,
             this.settings.maxHeapSize ?? 10000000, // 10mb
+            secret,
             this.settings.reportHeapSize,
             this.settings.dangerousBeforeCode
         );
@@ -111,6 +115,7 @@ export default class Isolated {
                         },
                     });
                 },
+                secret,
                 this.settings.reportHeapSize
             ); // initialize the event handler
 

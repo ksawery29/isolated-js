@@ -6,6 +6,7 @@ export default function eventHandler(
     iframe: HTMLIFrameElement,
     settings: IsolatedSettings,
     onFinished: () => void,
+    secret: string,
     heapReporter: IsolatedSettings["reportHeapSize"]
 ): () => void {
     let finished = false;
@@ -26,6 +27,10 @@ export default function eventHandler(
 
         // get the message and parse it
         try {
+            if (event.data.secret !== secret) {
+                console.error("isolated-js: secret does not match on message", event.data);
+                return;
+            }
             switch (event.data.type) {
                 case "console":
                     if (event.data.method == undefined) {

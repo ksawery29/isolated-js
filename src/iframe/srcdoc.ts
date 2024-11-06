@@ -6,6 +6,7 @@ const generateSrcdoc = (
     predefined: PredefinedFunctions | undefined,
     userCode: string,
     maxHeapSize: number,
+    secret: string,
     heapReporter: IsolatedSettings["reportHeapSize"],
     before?: string
 ) => {
@@ -30,7 +31,7 @@ const generateSrcdoc = (
             if (isEventListener(predefined[key])) {
                 return `function ${key}(fn) {
                     // try to register the event listener
-                    window.parent.postMessage({type: "register_event_listener", name: "${predefined[key].eventListener.name}"}, "*");
+                    window.parent.postMessage({type: "register_event_listener", name: "${predefined[key].eventListener.name}", secret: "${secret}"}, "*");
                     
                     const h = (event) => {
                         if (event.data.type === "event_listener_not_registered") {
@@ -45,9 +46,7 @@ const generateSrcdoc = (
                             try {fn(JSON.parse(args));} catch (e) {console.error(e);}
                         }
                     } 
-                    window.addEventListener("message", (event) => {
-                        h(event)
-                    });
+                    window.addEventListener("message", h);
                 }`;
             }
 
@@ -55,7 +54,7 @@ const generateSrcdoc = (
             const toStr = predefined[key].toString();
             const args = toStr.slice(toStr.indexOf("(") + 1, toStr.indexOf(")"));
 
-            const sendFunctionRequest = `window.parent.postMessage({type: "function", name: "${key}", args: Array.from(arguments)}, "*");`;
+            const sendFunctionRequest = `window.parent.postMessage({type: "function", name: "${key}", args: Array.from(arguments), secret: "${secret}"}, "*");`;
             const waitForResult = `return new Promise((resolve) => {
                 ${sendFunctionRequest}
                 window.addEventListener("message", function handler(event) {
@@ -84,9 +83,9 @@ const generateSrcdoc = (
                 try {
                     const serializableArgs = args.map((arg) => {
                         if (arg instanceof Promise) {
-                            return 'Got [Promise]. You should await this to get the result.';
+                            return "Got [Promise]. You should await this to get the result.";
                         }
-                        if (typeof arg === 'number') {
+                        if (typeof arg === "number") {
                             return arg;
                         }
                         if (arg === undefined) {
@@ -100,7 +99,7 @@ const generateSrcdoc = (
                         return arg?.toString();
                     });
     
-                    window.parent.postMessage({ type: "console", method, args: serializableArgs }, "*");
+                    window.parent.postMessage({ type: "console", method, args: serializableArgs, secret: "${secret}" }, "*");
                 } catch (e) {
                     original("isolated-js:", e);
                 }
@@ -125,30 +124,19 @@ const generateSrcdoc = (
         heapReport = `
             const ${heapSizeIntervalId} = setInterval(() => {
                 const usage = window.performance.memory.usedJSHeapSize;
-                window.parent.postMessage({type: "heap_size", args: usage}, "*");
+                window.parent.postMessage({type: "heap_size", args: usage, secret: "${secret}"}, "*");
             }, ${heapReporter.interval});
         `;
     }
 
-    const csp = `<meta http-equiv="Content-Security-Policy" content="
-        default-src 'none';
-        script-src 'unsafe-inline';
-        connect-src 'none';
-        style-src 'none';
-        img-src 'none';
-        font-src 'none';
-        object-src 'none';
-        media-src 'none';
-        frame-src 'none';
-    ">`;
+    const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; connect-src 'none'; style-src 'none'; img-src 'none'; font-src 'none'; object-src 'none'; media-src 'none'; frame-src 'none';">`;
 
-    const end = `window.parent.postMessage({type: "finished_execution", args: ""}, "*");`;
-    const sendError = `window.parent.postMessage({type: "error", args: JSON.stringify({
-        name: e.name,
-        message: e.message,
-        stack: e.stack,
-        e
-    })}, "*");`;
+    const end = `window.parent.postMessage({type: "finished_execution", args: "", secret: "${secret}"}, "*");`;
+    const sendError = `window.parent.postMessage({
+        type: "error",
+        args: JSON.stringify({name: e.name, message: e.message, stack: e.stack, e}),
+        secret: "${secret}"
+    }, "*");`;
 
     const clearHeapInterval = heapReporter?.shouldReport ? `clearInterval(${heapSizeIntervalId});` : "";
 

@@ -3,4 +3,5 @@ export interface EventHandlerType {
     method?: "log" | "warn" | "error" | "debug"; // used for console only
     name?: string; // used for functions only
     args: string | string[] | number; // used for console, functions, error and heap size
+    secret: string;
 }
