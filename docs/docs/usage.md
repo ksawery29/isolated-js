@@ -220,6 +220,21 @@ maxHeapSize: 10000000 // 10mb
 
 Default: 10000000 (10mb)
 
+### Listening for the heap size
+If you want to listen for the heap size of the isolated environment, to, for example, warn the developer if its getting close to the limit, you can use the 'reportHeapSize' object in the settings.
+See the example below:
+```javascript
+reportHeapSize: {
+    shouldReport: true,
+    interval: 1000, // in ms
+    onHeapSize: (size) => {
+        console.warn(`Heap size is getting close to the limit! Current size: ${size} bytes`);
+    }
+}
+```
+
+Default: `{ shouldReport: false }`
+
 ### A few notes
 - `isolated.start` returns a promise that resolves with an object containing the dispatch function and the iframe element. You can use the dispatch function to send events to the isolated environment or use the iframe element to manipulate the iframe.
 - IsolatedJS is still in **WIP**. It was primarily made for [my](https://github.com/ksawery29) side project (🔜) so you might find some features missing. If you want, you can help me by contributing to make this project better! 🙌
