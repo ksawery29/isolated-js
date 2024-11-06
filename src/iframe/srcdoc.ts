@@ -2,7 +2,13 @@
 
 import { type PredefinedFunctions, type EventListener } from "../types/main";
 
-const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: string, maxHeapSize: number, before?: string) => {
+const generateSrcdoc = (
+    predefined: PredefinedFunctions | undefined,
+    userCode: string,
+    maxHeapSize: number,
+    reportHeapSize: boolean,
+    before?: string
+) => {
     // from predefined functions generate "getters" for them
     // this is probably not the best way to do it, but works for now
     let getters: string[] | undefined;
@@ -107,6 +113,17 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         }, 100);
     `;
 
+    const heapSizeIntervalId = Math.random().toString(36).slice(2, 11);
+    let heapReport = "";
+    if (reportHeapSize) {
+        heapReport = `
+            const ${heapSizeIntervalId} = setInterval(() => {
+                const usage = window.performance.memory.usedJSHeapSize;
+                window.parent.postMessage({type: "heap_size", args: usage}, "*");
+            }, 1000);
+        `;
+    }
+
     const csp = `<meta http-equiv="Content-Security-Policy" content="
         default-src 'none';
         script-src 'unsafe-inline';
@@ -138,9 +155,11 @@ const generateSrcdoc = (predefined: PredefinedFunctions | undefined, userCode: s
         });
     `;
 
-    return `${csp}<script>(async () => { ${before ?? ""}; try { ${heapSizeLimiter}; ${navigationBlocker}; ${customLogHandler}; ${
+    return `${csp}<script>(async () => { ${
+        before ?? ""
+    }; try { ${heapSizeLimiter}; ${heapReport}; ${navigationBlocker}; ${customLogHandler}; ${
         getters && getters.join(" ")
-    }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end}; } })() /*isolated-js*/</script>`;
+    }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end}; clearInterval(${heapSizeIntervalId}); } })() /*isolated-js*/</script>`;
 };
 
 export default generateSrcdoc;

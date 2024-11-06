@@ -18,6 +18,7 @@ export default class Isolated {
         this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
 
         this.settings.maxHeapSize = this.settings.maxHeapSize ?? 10000000; // 10mb
+        this.settings.reportHeapSize = this.settings.reportHeapSize ?? false;
 
         this.settings.allowEventCreationAfterInit = this.settings.allowEventCreationAfterInit ?? false;
         this.settings.maxGlobalEventListeners = this.settings.maxGlobalEventListeners ?? -1;
@@ -32,6 +33,7 @@ export default class Isolated {
             this.settings.predefinedFunctions,
             this.userCode,
             this.settings.maxHeapSize ?? 10000000, // 10mb
+            this.settings.reportHeapSize ?? false,
             this.settings.dangerousBeforeCode
         );
 
