@@ -86,12 +86,18 @@ const generateSrcdoc = (
                         if (arg instanceof Promise) {
                             return 'Got [Promise]. You should await this to get the result.';
                         }
+                        if (typeof arg === 'number') {
+                            return arg;
+                        }
+                        if (arg === undefined) {
+                            return "undefined";
+                        }
                         if (typeof arg !== "string") {
                             try {
                                 arg = JSON.stringify(arg);
                             } catch {}
                         }
-                        return arg.toString();
+                        return arg?.toString();
                     });
     
                     window.parent.postMessage({ type: "console", method, args: serializableArgs }, "*");
@@ -144,22 +150,11 @@ const generateSrcdoc = (
         e
     })}, "*");`;
 
-    const navigationBlocker = `
-        window.location = new Proxy(window.location, {
-            set: () => undefined,
-            get: () => undefined,
-        });
-        window.history = new Proxy(window.history, {
-            set: () => undefined,
-            get: () => undefined,
-        });
-    `;
+    const clearHeapInterval = heapReporter?.shouldReport ? `clearInterval(${heapSizeIntervalId});` : "";
 
-    return `${csp}<script>(async () => { ${
-        before ?? ""
-    }; try { ${heapSizeLimiter}; ${heapReport}; ${navigationBlocker}; ${customLogHandler}; ${
+    return `${csp}<script>(async () => { ${heapReport}; ${before ?? ""}; ${heapSizeLimiter}; try {${customLogHandler}; ${
         getters && getters.join(" ")
-    }; ${userCode}; ${end} } catch (e) { ${sendError}; ${end}; clearInterval(${heapSizeIntervalId}); } })() /*isolated-js*/</script>`;
+    }; ${userCode}; ${end}; } catch (e) { ${sendError}; ${end}; ${clearHeapInterval}; }; })();/*isolated-js*/</script>`;
 };
 
 export default generateSrcdoc;

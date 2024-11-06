@@ -11,16 +11,24 @@
         import Isolated from "../../dist/main.js";
 
         document.getElementById("button").addEventListener("click", async () => {
-            const isolated = await new Isolated("console.log({message: 'I will attack you 😊'}, 'ok! i dont care'); console.debug('a debug message'); throw new Error('hi'); await new Promise((resolve) => setTimeout(() => {console.log('hi')}, 3000));", {
+            const isolated = await new Isolated("console.log({message: 'I will attack you 😊'}, 'ok! i dont care'); await waitForMe(); console.debug('a debug message'); throw new Error('hi'); await new Promise((resolve) => setTimeout(() => {console.log('hi')}, 3000));", {
                 onConsole: (type, content) => console[type]("a message from iframe:", ...content),
                 maxIframes: 2,
                 onError: (error) => console.error("an error occured:", error.stack),
                 // dangerousBeforeCode: "return;" <- use with caution
                 removeOnFinish: false,
-                reportHeapSize: true
-            }).start().then(() => {
-                console.log("yay, I am safe now 😊");
-            });
+                reportHeapSize: {
+                    shouldReport: true,
+                    interval: 1000,
+                    onHeapSize: (size) => console.log("heap size:", size)
+                },
+                predefinedFunctions: {
+                    waitForMe: async () => {
+                    await new Promise((resolve) => setTimeout(() => {resolve()}, 3000));
+                        console.log("Thanks for waiting!")
+                    }
+                },
+            }).start()
 
             console.log(isolated)
         })
