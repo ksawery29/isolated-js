@@ -107,9 +107,10 @@ const generateSrcdoc = (
         });
     })();`;
 
+    const heapSizeLimiterIntervalId = Math.random().toString(36).slice(2, 11);
     const heapSizeLimiter = `
         // check the memory usage of the iframe every 100ms
-        setInterval(() => {
+        const ${heapSizeLimiterIntervalId} = setInterval(() => {
             const usage = window.performance.memory.usedJSHeapSize;
             if (usage > ${maxHeapSize}) {
                 console.error("isolated-js: memory usage exceeded, killing the iframe");
@@ -118,11 +119,11 @@ const generateSrcdoc = (
         }, 100);
     `;
 
-    const heapSizeIntervalId = Math.random().toString(36).slice(2, 11);
+    const heapIntervalListenerId = Math.random().toString(36).slice(2, 11);
     let heapReport = "";
     if (heapReporter?.shouldReport) {
         heapReport = `
-            const ${heapSizeIntervalId} = setInterval(() => {
+            const ${heapIntervalListenerId} = setInterval(() => {
                 const usage = window.performance.memory.usedJSHeapSize;
                 window.parent.postMessage({type: "heap_size", args: usage, secret: "${secret}"}, "*");
             }, ${heapReporter.interval});
@@ -138,11 +139,13 @@ const generateSrcdoc = (
         secret: "${secret}"
     }, "*");`;
 
-    const clearHeapInterval = heapReporter?.shouldReport ? `clearInterval(${heapSizeIntervalId});` : "";
+    const clearHeapIntervalListener = heapReporter?.shouldReport ? `clearInterval(${heapIntervalListenerId});` : "";
+    const clearHeapSizeLimiterInterval = `clearInterval(${heapSizeLimiterIntervalId});`;
+    const cleanup = `${end}; ${clearHeapIntervalListener}; ${clearHeapSizeLimiterInterval};`;
 
     return `${csp}<script>(async () => { ${heapReport}; ${before ?? ""}; ${heapSizeLimiter}; try {${customLogHandler}; ${
         getters && getters.join(" ")
-    }; ${userCode}; ${end}; } catch (e) { ${sendError}; ${end}; ${clearHeapInterval}; }; })();/*isolated-js*/</script>`;
+    }; ${userCode}; ${cleanup} } catch (e) { ${sendError}; ${cleanup}; }; })();/*isolated-js*/</script>`;
 };
 
 export default generateSrcdoc;
