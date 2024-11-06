@@ -20,7 +20,11 @@ export interface IsolatedSettings {
     maxGlobalEventListeners?: number; // max number of all event listeners, default is -1 (infinite)
     dangerousBeforeCode?: string;
     maxHeapSize?: number; // max heap size in bytes, default is 10000000 (10mb)
-    reportHeapSize?: boolean; // report heap size in bytes, default is false, if true, every second it will be dispatched to _isolated_js_heap_size
+    reportHeapSize?: {
+        shouldReport: boolean;
+        interval: number; // in ms
+        onHeapSize?: (size: number) => void | Promise<void>; // on heap size
+    }; // report heap size in bytes, default is false, if true, every second it will be dispatched to _isolated_js_heap_size
 }
 
 export interface StartReturn {

@@ -18,7 +18,7 @@ export default class Isolated {
         this.settings.removeOnFinish = this.settings.removeOnFinish ?? true;
 
         this.settings.maxHeapSize = this.settings.maxHeapSize ?? 10000000; // 10mb
-        this.settings.reportHeapSize = this.settings.reportHeapSize ?? false;
+        this.settings.reportHeapSize = this.settings.reportHeapSize ?? { shouldReport: false, interval: 1000 };
 
         this.settings.allowEventCreationAfterInit = this.settings.allowEventCreationAfterInit ?? false;
         this.settings.maxGlobalEventListeners = this.settings.maxGlobalEventListeners ?? -1;
@@ -33,7 +33,7 @@ export default class Isolated {
             this.settings.predefinedFunctions,
             this.userCode,
             this.settings.maxHeapSize ?? 10000000, // 10mb
-            this.settings.reportHeapSize ?? false,
+            this.settings.reportHeapSize,
             this.settings.dangerousBeforeCode
         );
 
@@ -73,41 +73,46 @@ export default class Isolated {
                 }, this.settings.timeout);
             }
 
-            const cleanup = eventHandler(iframe, this.settings, () => {
-                if (this.settings.timeout != -1) clearTimeout(id);
-                if (this.settings.removeOnFinish) shadowRoot.remove();
+            const cleanup = eventHandler(
+                iframe,
+                this.settings,
+                () => {
+                    if (this.settings.timeout != -1) clearTimeout(id);
+                    if (this.settings.removeOnFinish) shadowRoot.remove();
 
-                resolve({
-                    element: iframe,
-                    dispatch: (name: string, args: object) => {
-                        if (!this.settings.predefinedFunctions) {
-                            console.error("isolated-js: no predefined functions defined");
-                            return;
-                        }
+                    resolve({
+                        element: iframe,
+                        dispatch: (name: string, args: object) => {
+                            if (!this.settings.predefinedFunctions) {
+                                console.error("isolated-js: no predefined functions defined");
+                                return;
+                            }
 
-                        // check if there are any event listeners with this name to dispatch
-                        if (this.settings.predefinedFunctions[name] == undefined) {
-                            console.error(`isolated-js: no event listener with the name ${name}`);
-                            return;
-                        }
+                            // check if there are any event listeners with this name to dispatch
+                            if (this.settings.predefinedFunctions[name] == undefined) {
+                                console.error(`isolated-js: no event listener with the name ${name}`);
+                                return;
+                            }
 
-                        // check if the iframe is still there
-                        if (!iframe.contentWindow) {
-                            console.error(
-                                "isolated-js: iframe is not there. It was probably automatically removed by timeout. Set removeOnFinish to false to prevent this"
-                            );
-                            return;
-                        }
+                            // check if the iframe is still there
+                            if (!iframe.contentWindow) {
+                                console.error(
+                                    "isolated-js: iframe is not there. It was probably automatically removed by timeout. Set removeOnFinish to false to prevent this"
+                                );
+                                return;
+                            }
 
-                        // finally dispatch the event
-                        try {
-                            iframe.contentWindow.postMessage({ type: "event", name, args: JSON.stringify(args) }, "*");
-                        } catch (e) {
-                            console.error("isolated-js:", e);
-                        }
-                    },
-                });
-            }); // initialize the event handler
+                            // finally dispatch the event
+                            try {
+                                iframe.contentWindow.postMessage({ type: "event", name, args: JSON.stringify(args) }, "*");
+                            } catch (e) {
+                                console.error("isolated-js:", e);
+                            }
+                        },
+                    });
+                },
+                this.settings.reportHeapSize
+            ); // initialize the event handler
 
             iframe.setAttribute("sandbox", "allow-scripts");
 

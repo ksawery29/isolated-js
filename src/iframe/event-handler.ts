@@ -2,7 +2,12 @@ import { type EventHandlerType } from "../types/iframe";
 import { type IsolatedSettings } from "../types/main";
 
 // an event handler for all messages
-export default function eventHandler(iframe: HTMLIFrameElement, settings: IsolatedSettings, onFinished: () => void): () => void {
+export default function eventHandler(
+    iframe: HTMLIFrameElement,
+    settings: IsolatedSettings,
+    onFinished: () => void,
+    heapReporter: IsolatedSettings["reportHeapSize"]
+): () => void {
     let finished = false;
 
     // store how many event listeners are there (for max)
@@ -49,7 +54,7 @@ export default function eventHandler(iframe: HTMLIFrameElement, settings: Isolat
                                 }
                             });
                         } else {
-                            event.data.args = [event.data.args];
+                            event.data.args = [event.data.args as string]; // it is safe to assume string will be used here
                         }
 
                         settings.onConsole(event.data.method, event.data.args);
@@ -74,7 +79,9 @@ export default function eventHandler(iframe: HTMLIFrameElement, settings: Isolat
                         settings.predefinedFunctions[functionName] &&
                         typeof settings.predefinedFunctions[functionName] === "function"
                     ) {
-                        const val = await settings.predefinedFunctions[functionName](...functionArgs);
+                        const val = await settings.predefinedFunctions[functionName](
+                            ...(Array.isArray(functionArgs) ? functionArgs : [functionArgs])
+                        );
 
                         // send the result back
                         iframe.contentWindow?.postMessage(
@@ -158,6 +165,11 @@ export default function eventHandler(iframe: HTMLIFrameElement, settings: Isolat
                         settings.onError(event.data.args);
                     } else {
                         console.error("isolated-js: got an error but no error handler is defined");
+                    }
+                    break;
+                case "heap_size":
+                    if (heapReporter?.onHeapSize) {
+                        heapReporter.onHeapSize(event.data.args as number);
                     }
                     break;
                 default:

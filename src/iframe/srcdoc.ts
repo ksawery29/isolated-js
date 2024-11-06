@@ -1,12 +1,12 @@
 // content for the iframe (see "Isolated" class)
 
-import { type PredefinedFunctions, type EventListener } from "../types/main";
+import { type PredefinedFunctions, type EventListener, IsolatedSettings } from "../types/main";
 
 const generateSrcdoc = (
     predefined: PredefinedFunctions | undefined,
     userCode: string,
     maxHeapSize: number,
-    reportHeapSize: boolean,
+    heapReporter: IsolatedSettings["reportHeapSize"],
     before?: string
 ) => {
     // from predefined functions generate "getters" for them
@@ -115,12 +115,12 @@ const generateSrcdoc = (
 
     const heapSizeIntervalId = Math.random().toString(36).slice(2, 11);
     let heapReport = "";
-    if (reportHeapSize) {
+    if (heapReporter?.shouldReport) {
         heapReport = `
             const ${heapSizeIntervalId} = setInterval(() => {
                 const usage = window.performance.memory.usedJSHeapSize;
                 window.parent.postMessage({type: "heap_size", args: usage}, "*");
-            }, 1000);
+            }, ${heapReporter.interval});
         `;
     }
 
