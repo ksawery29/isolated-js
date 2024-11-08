@@ -107,7 +107,7 @@ const generateSrcdoc = (
         });
     })();`;
 
-    const heapSizeLimiterIntervalId = Math.random().toString(36).slice(2, 11);
+    const heapSizeLimiterIntervalId = `_${Math.random().toString(36).slice(2, 11)}`;
     const heapSizeLimiter = `
         // check the memory usage of the iframe every 100ms
         const ${heapSizeLimiterIntervalId} = setInterval(() => {
@@ -119,7 +119,7 @@ const generateSrcdoc = (
         }, 100);
     `;
 
-    const heapIntervalListenerId = Math.random().toString(36).slice(2, 11);
+    const heapIntervalListenerId = `_${Math.random().toString(36).slice(2, 11)}`;
     let heapReport = "";
     if (heapReporter?.shouldReport) {
         heapReport = `
